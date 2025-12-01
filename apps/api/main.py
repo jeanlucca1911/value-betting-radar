@@ -1,3 +1,4 @@
+print("Loading main.py...")
 from fastapi import FastAPI
 from core.config import settings
 

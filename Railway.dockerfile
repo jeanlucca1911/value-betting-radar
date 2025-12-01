@@ -17,5 +17,9 @@ COPY apps/api/ .
 # Expose the port
 EXPOSE 8000
 
-# Command to run the application using the PORT environment variable provided by Railway
-CMD uvicorn main:app --host 0.0.0.0 --port $PORT
+# Copy start script
+COPY apps/api/start.sh .
+RUN chmod +x start.sh
+
+# Command to run the application
+CMD ["./start.sh"]
