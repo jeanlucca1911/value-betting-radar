@@ -13,19 +13,16 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+@app.get("/")
+async def root():
+    return {"message": "Value Betting Radar API is running"}
+
 @app.get("/health")
 async def health_check():
-    from db.redis import redis_client
-    try:
-        await redis_client.ping()
-        redis_status = "ok"
-    except Exception:
-        redis_status = "error"
-        
+    # Simple health check that doesn't depend on external services
     return {
         "status": "ok", 
-        "project": settings.PROJECT_NAME,
-        "redis": redis_status
+        "project": settings.PROJECT_NAME
     }
 
 from routers import odds, bets, auth, advanced
