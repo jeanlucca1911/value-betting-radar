@@ -1,0 +1,40 @@
+import numpy as np
+from scipy.optimize import newton
+
+class PowerMethod:
+    @staticmethod
+    def calculate_true_probabilities(odds: list[float]) -> list[float]:
+        """
+        Calculates true probabilities from bookmaker odds using the Power Method.
+        Solves for k where sum(1/odds^k) = 1.
+        """
+        if not odds or any(o <= 1.0 for o in odds):
+            return []
+
+        # Target function: sum(p_implied^k) - 1 = 0
+        # where p_implied = 1/odd
+        implied_probs = np.array([1.0 / o for o in odds])
+        
+        def equation(k):
+            return np.sum(np.power(implied_probs, k)) - 1.0
+
+        try:
+            # Solve for k using Newton-Raphson method
+            # Initial guess k=1 (which would mean no margin if sum=1)
+            k = newton(equation, x0=1.0, maxiter=50)
+            
+            # Calculate true probabilities: p_true = p_implied^k
+            true_probs = np.power(implied_probs, k)
+            return true_probs.tolist()
+        except RuntimeError:
+            # Convergence failed, fallback to basic normalization
+            total_implied = np.sum(implied_probs)
+            return (implied_probs / total_implied).tolist()
+
+    @staticmethod
+    def calculate_edge(soft_odds: float, true_prob: float) -> float:
+        """
+        Calculates the edge (expected value) of a bet.
+        Edge = (Probability * Odds) - 1
+        """
+        return (true_prob * soft_odds) - 1.0
