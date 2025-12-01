@@ -9,6 +9,16 @@ from typing import List
 
 router = APIRouter()
 
+class PlaceBetRequest(BaseModel):
+    match_id: str
+    home_team: str
+    away_team: str
+    selection: str
+    odds: float
+    stake: float
+    bookmaker: str
+    edge: float
+
 class PortfolioStats(BaseModel):
     total_bets: int
     settled_bets: int
@@ -113,3 +123,37 @@ async def get_portfolio_stats(
         ),
         daily_profits=daily_profits
     )
+
+@router.post("/place")
+async def place_bet(
+    bet_request: PlaceBetRequest,
+    user_email: str = "test@example.com",  # TODO: Get from JWT
+    db: AsyncSession = Depends(get_db)
+):
+    """Place a new bet (paper trading)"""
+    
+    # Create new bet
+    new_bet = Bet(
+        user_email=user_email,
+        match_id=bet_request.match_id,
+        home_team=bet_request.home_team,
+        away_team=bet_request.away_team,
+        selection=bet_request.selection,
+        odds=bet_request.odds,
+        stake=bet_request.stake,
+        bookmaker=bet_request.bookmaker,
+        edge=bet_request.edge,
+        potential_return=bet_request.stake * bet_request.odds,
+        status="pending",
+        placed_at=datetime.utcnow()
+    )
+    
+    db.add(new_bet)
+    await db.commit()
+    await db.refresh(new_bet)
+    
+    return {
+        "success": True,
+        "bet_id": new_bet.id,
+        "message": f"Bet placed: {bet_request.selection} @ {bet_request.odds}"
+    }
