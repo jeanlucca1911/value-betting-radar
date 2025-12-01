@@ -7,7 +7,7 @@ async def get_redis():
     global redis_client
     if redis_client is None:
         try:
-            redis_url = settings.REDIS_URL
+            redis_url = settings.FINAL_REDIS_URL
             if redis_url:
                 redis_client = redis.from_url(redis_url, encoding="utf-8", decode_responses=True)
                 # Test connection
