@@ -36,6 +36,12 @@ class Settings(BaseSettings):
         # Using SQLite for local development (no Docker required)
         return "sqlite+aiosqlite:///./sql_app.db"
 
+    @property
+    def FINAL_REDIS_URL(self) -> str:
+        if self.REDIS_URL:
+            return self.REDIS_URL
+        return f"redis://{self.REDIS_HOST}:{self.REDIS_PORT}/0"
+
     class Config:
         env_file = ".env"
 
