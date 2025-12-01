@@ -3,6 +3,7 @@
 import { useState, Fragment } from "react";
 import { ValueBet } from "@/hooks/useLiveOdds";
 import { RadarVisualizer } from "./RadarVisualizer";
+import { API_BASE_URL } from "@/lib/api";
 
 interface Props {
   bets: ValueBet[];
@@ -18,7 +19,7 @@ export function OddsTable({ bets, lastUpdate }: Props) {
 
   const placeBet = async (bet: ValueBet) => {
     try {
-      const res = await fetch("http://localhost:8000/api/v1/bets/place", {
+      const res = await fetch(`${API_BASE_URL}/bets/place`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -33,13 +34,13 @@ export function OddsTable({ bets, lastUpdate }: Props) {
         }),
       });
       if (res.ok) {
-        alert(`Bet placed on ${bet.outcome} @ ${bet.odds}`);
+        alert(`Bet tracked! ${bet.outcome} @ ${bet.odds}`);
       } else {
-        alert("Failed to place bet");
+        alert("Failed to track bet");
       }
     } catch (e) {
       console.error(e);
-      alert("Error placing bet");
+      alert("Error tracking bet");
     }
   };
 

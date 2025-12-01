@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { API_BASE_URL } from "@/lib/api";
 
 export default function LoginPage() {
     const router = useRouter();
@@ -21,7 +22,7 @@ export default function LoginPage() {
             formData.append("username", email);
             formData.append("password", password);
 
-            const res = await fetch("http://localhost:8000/api/v1/auth/token", {
+            const res = await fetch(`${API_BASE_URL}/auth/token`, {
                 method: "POST",
                 body: formData,
             });

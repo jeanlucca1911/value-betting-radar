@@ -2,6 +2,7 @@
 
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { useEffect, useState } from 'react';
+import { API_BASE_URL } from '@/lib/api';
 
 interface PortfolioStats {
     total_bets: number;
@@ -26,7 +27,7 @@ export function PortfolioDashboard() {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        fetch('http://localhost:8000/api/v1/bets/stats?user_email=test@example.com')
+        fetch(`${API_BASE_URL}/bets/stats?user_email=test@example.com`)
             .then(res => res.json())
             .then(data => {
                 setStats(data.stats);

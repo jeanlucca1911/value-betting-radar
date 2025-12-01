@@ -56,8 +56,8 @@ export default function AdvancedMarketsPage() {
                 <button
                     onClick={() => setActiveTab('props')}
                     className={`px-6 py-3 rounded-lg font-semibold transition-all ${activeTab === 'props'
-                            ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-500/20'
-                            : 'bg-slate-800 text-slate-400 hover:bg-slate-700'
+                        ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-500/20'
+                        : 'bg-slate-800 text-slate-400 hover:bg-slate-700'
                         }`}
                 >
                     Player Props
@@ -65,8 +65,8 @@ export default function AdvancedMarketsPage() {
                 <button
                     onClick={() => setActiveTab('scores')}
                     className={`px-6 py-3 rounded-lg font-semibold transition-all ${activeTab === 'scores'
-                            ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-500/20'
-                            : 'bg-slate-800 text-slate-400 hover:bg-slate-700'
+                        ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-500/20'
+                        : 'bg-slate-800 text-slate-400 hover:bg-slate-700'
                         }`}
                 >
                     Correct Scores
@@ -74,8 +74,8 @@ export default function AdvancedMarketsPage() {
                 <button
                     onClick={() => setActiveTab('parlay')}
                     className={`px-6 py-3 rounded-lg font-semibold transition-all ${activeTab === 'parlay'
-                            ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-500/20'
-                            : 'bg-slate-800 text-slate-400 hover:bg-slate-700'
+                        ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-500/20'
+                        : 'bg-slate-800 text-slate-400 hover:bg-slate-700'
                         }`}
                 >
                     Parlay Builder
@@ -122,7 +122,10 @@ export default function AdvancedMarketsPage() {
                                             </div>
                                             <div className="text-2xl font-bold text-emerald-400">{prop.odds}</div>
                                         </div>
-                                        <button className="w-full mt-4 py-2 bg-emerald-600/10 hover:bg-emerald-600 text-emerald-400 hover:text-white rounded-lg text-sm font-semibold transition-colors">
+                                        <button
+                                            onClick={() => alert('Parlay Builder coming soon! This will add the bet to your slip.')}
+                                            className="w-full mt-4 py-2 bg-emerald-600/10 hover:bg-emerald-600 text-emerald-400 hover:text-white rounded-lg text-sm font-semibold transition-colors"
+                                        >
                                             Add to Slip
                                         </button>
                                     </div>
@@ -168,7 +171,10 @@ export default function AdvancedMarketsPage() {
                                             </div>
                                             <div className="text-2xl font-bold text-purple-400">{score.odds}</div>
                                         </div>
-                                        <button className="w-full mt-4 py-2 bg-purple-600/10 hover:bg-purple-600 text-purple-400 hover:text-white rounded-lg text-sm font-semibold transition-colors">
+                                        <button
+                                            onClick={() => alert('Parlay Builder coming soon! This will add the bet to your slip.')}
+                                            className="w-full mt-4 py-2 bg-purple-600/10 hover:bg-purple-600 text-purple-400 hover:text-white rounded-lg text-sm font-semibold transition-colors"
+                                        >
                                             Add to Slip
                                         </button>
                                     </div>
