@@ -1,7 +1,9 @@
 "use client";
 
+import { useState } from 'react';
 import { useLiveOdds } from '@/hooks/useLiveOdds';
 import { OddsTable } from '@/components/OddsTable';
+import { LeagueSelector } from '@/components/LeagueSelector';
 import { LoadingSkeleton, EmptyState } from '@/components/LoadingStates';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/Button';
@@ -12,7 +14,8 @@ import Link from 'next/link';
 import { usePortfolioStats } from '@/hooks/usePortfolioStats';
 
 export default function Dashboard() {
-  const { data, error, isLoading } = useLiveOdds();
+  const [sport, setSport] = useState("soccer_epl");
+  const { data, error, isLoading } = useLiveOdds(sport);
   const { stats } = usePortfolioStats();
 
   // Calculate average edge from live data if available
@@ -157,6 +160,8 @@ export default function Dashboard() {
             Refresh Data
           </Button>
         </div>
+
+        <LeagueSelector selectedLeague={sport} onSelect={setSport} />
 
         {error ? (
           <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-6 text-center">
