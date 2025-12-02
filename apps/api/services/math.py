@@ -38,3 +38,38 @@ class PowerMethod:
         Edge = (Probability * Odds) - 1
         """
         return (true_prob * soft_odds) - 1.0
+    
+    @staticmethod
+    def calculate_kelly_stake(odds: float, true_prob: float, bankroll: float = 1000.0, fractional_kelly: float = 0.25) -> dict:
+        """
+        Calculate the optimal stake using the Kelly Criterion.
+        
+        Args:
+            odds: Decimal odds (e.g., 2.5)
+            true_prob: True probability of winning (0-1)
+            bankroll: Total bankroll in dollars
+            fractional_kelly: Fraction of full Kelly to use (0.25 = Quarter Kelly, safer)
+        
+        Returns:
+            dict with kelly_percentage and recommended_stake
+        """
+        # Kelly Formula: f* = (bp - q) / b
+        # where b = net odds (odds - 1), p = win prob, q = lose prob (1 - p)
+        
+        b = odds - 1  # Net odds
+        p = true_prob
+        q = 1 - p
+        
+        # Full Kelly percentage
+        kelly_full = (b * p - q) / b
+        
+        # Apply fractional Kelly (e.g., 0.25 for Quarter Kelly)
+        kelly_fraction = max(0, kelly_full * fractional_kelly)  # Never negative
+        
+        # Calculate recommended stake
+        recommended_stake = bankroll * kelly_fraction
+        
+        return {
+            "kelly_percentage": round(kelly_fraction * 100, 2),  # As percentage
+            "recommended_stake": round(recommended_stake, 2)
+        }
