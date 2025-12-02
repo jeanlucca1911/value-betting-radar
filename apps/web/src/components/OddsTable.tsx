@@ -5,6 +5,7 @@ import { ValueBet } from "@/hooks/useLiveOdds";
 import { RadarVisualizer } from "./RadarVisualizer";
 import { API_BASE_URL } from "@/lib/api";
 import { usePortfolioStats } from "@/hooks/usePortfolioStats";
+import { useParlay } from "@/context/ParlayContext";
 
 interface Props {
   bets: ValueBet[];
@@ -14,6 +15,7 @@ interface Props {
 export function OddsTable({ bets, lastUpdate }: Props) {
   const [expandedBetId, setExpandedBetId] = useState<string | null>(null);
   const { mutate } = usePortfolioStats();
+  const { addBet, isInParlay } = useParlay();
 
   const toggleExpand = (id: string) => {
     setExpandedBetId(expandedBetId === id ? null : id);
@@ -164,6 +166,20 @@ export function OddsTable({ bets, lastUpdate }: Props) {
                           title="Track as Paper Bet"
                         >
                           Track
+                        </button>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            addBet(bet);
+                          }}
+                          disabled={isInParlay(bet.match_id)}
+                          className={`px-3 py-2 rounded-md text-xs font-medium transition-colors ${isInParlay(bet.match_id)
+                            ? "bg-purple-900/20 text-purple-700 cursor-not-allowed"
+                            : "bg-purple-600 hover:bg-purple-500 text-white"
+                            }`}
+                          title="Add to Parlay Builder"
+                        >
+                          + Parlay
                         </button>
                       </div>
                     </td>

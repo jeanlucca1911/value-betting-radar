@@ -10,6 +10,9 @@ export const metadata: Metadata = {
   description: "Detect and exploit market inefficiencies in soccer betting.",
 };
 
+import { ParlayProvider } from "@/context/ParlayContext";
+import { ParlaySlip } from "@/components/ParlaySlip";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -18,8 +21,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <NavBar />
-        <main className="max-w-7xl mx-auto p-8">{children}</main>
+        <ParlayProvider>
+          <NavBar />
+          <main className="max-w-7xl mx-auto p-8">{children}</main>
+          <ParlaySlip />
+        </ParlayProvider>
       </body>
     </html>
   );

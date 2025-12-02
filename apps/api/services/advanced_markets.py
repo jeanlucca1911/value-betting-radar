@@ -90,26 +90,27 @@ class AdvancedMarketsService:
     def calculate_parlay_edge(self, bets: List[Dict[str, Any]]) -> Dict[str, Any]:
         """
         Calculate the combined odds and edge for a parlay.
-        Assumes independent events for now.
+        Assumes independent events.
         """
         combined_odds = 1.0
-        combined_prob = 1.0
+        combined_true_prob = 1.0
         
         for bet in bets:
-            combined_odds *= bet['odds']
-            # Estimate true probability from edge if available, else implied prob
-            implied_prob = 1 / bet['odds']
-            # If we have a calculated edge, true_prob = implied_prob / (1 - edge) roughly
-            # For this MVP, let's assume a small edge boost for "pockets"
-            true_prob = implied_prob * 1.05 # 5% value assumption for demo
-            combined_prob *= true_prob
+            combined_odds *= bet.get('odds', 1.0)
             
-        fair_odds = 1 / combined_prob if combined_prob > 0 else 0
-        edge = (combined_odds - fair_odds) / fair_odds if fair_odds > 0 else 0
+            # Use provided true_probability if available, otherwise implied probability
+            if 'true_probability' in bet:
+                combined_true_prob *= bet['true_probability']
+            else:
+                # Fallback: Implied probability (no edge assumed)
+                combined_true_prob *= (1 / bet.get('odds', 1.0))
+            
+        # Edge = (True Prob * Odds) - 1
+        edge = (combined_true_prob * combined_odds) - 1
         
         return {
             "combined_odds": round(combined_odds, 2),
-            "fair_odds": round(fair_odds, 2),
+            "true_probability": round(combined_true_prob, 4),
             "edge_percent": round(edge * 100, 2),
             "legs": len(bets)
         }
