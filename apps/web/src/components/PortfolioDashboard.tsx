@@ -1,44 +1,9 @@
-"use client";
-
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { useEffect, useState } from 'react';
-import { API_BASE_URL } from '@/lib/api';
-
-interface PortfolioStats {
-    total_bets: number;
-    settled_bets: number;
-    pending_bets: number;
-    total_staked: number;
-    total_returned: number;
-    net_profit: number;
-    roi: number;
-    win_rate: number;
-}
-
-interface DailyProfit {
-    date: string;
-    profit: number;
-    cumulative_profit: number;
-}
+import { usePortfolioStats } from '@/hooks/usePortfolioStats';
 
 export function PortfolioDashboard() {
-    const [stats, setStats] = useState<PortfolioStats | null>(null);
-    const [chartData, setChartData] = useState<DailyProfit[]>([]);
-    const [loading, setLoading] = useState(true);
-
-    useEffect(() => {
-        fetch(`${API_BASE_URL}/bets/stats?user_email=test@example.com`)
-            .then(res => res.json())
-            .then(data => {
-                setStats(data.stats);
-                setChartData(data.daily_profits);
-                setLoading(false);
-            })
-            .catch(err => {
-                console.error('Failed to load portfolio stats:', err);
-                setLoading(false);
-            });
-    }, []);
+    const { stats, dailyProfits, isLoading: loading } = usePortfolioStats();
+    const chartData = dailyProfits || [];
 
     if (loading) {
         return (

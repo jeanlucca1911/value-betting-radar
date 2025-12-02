@@ -4,6 +4,7 @@ import { useState, Fragment } from "react";
 import { ValueBet } from "@/hooks/useLiveOdds";
 import { RadarVisualizer } from "./RadarVisualizer";
 import { API_BASE_URL } from "@/lib/api";
+import { usePortfolioStats } from "@/hooks/usePortfolioStats";
 
 interface Props {
   bets: ValueBet[];
@@ -12,6 +13,7 @@ interface Props {
 
 export function OddsTable({ bets, lastUpdate }: Props) {
   const [expandedBetId, setExpandedBetId] = useState<string | null>(null);
+  const { mutate } = usePortfolioStats();
 
   const toggleExpand = (id: string) => {
     setExpandedBetId(expandedBetId === id ? null : id);
@@ -35,6 +37,7 @@ export function OddsTable({ bets, lastUpdate }: Props) {
       });
       if (res.ok) {
         alert(`Bet tracked! ${bet.outcome} @ ${bet.odds}`);
+        mutate(); // Refresh stats immediately
       } else {
         alert("Failed to track bet");
       }

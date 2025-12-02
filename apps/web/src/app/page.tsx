@@ -9,8 +9,16 @@ import { Badge } from '@/components/ui/Badge';
 import { ArrowRight, TrendingUp, ShieldCheck, Zap, Radar } from 'lucide-react';
 import Link from 'next/link';
 
+import { usePortfolioStats } from '@/hooks/usePortfolioStats';
+
 export default function Dashboard() {
   const { data, error, isLoading } = useLiveOdds();
+  const { stats } = usePortfolioStats();
+
+  // Calculate average edge from live data if available
+  const avgEdge = data && data.length > 0
+    ? (data.reduce((acc, bet) => acc + bet.edge, 0) / data.length).toFixed(1)
+    : "0.0";
 
   return (
     <div className="space-y-12 pb-12">
@@ -106,8 +114,12 @@ export default function Dashboard() {
             </div>
             <h3 className="text-slate-400 font-medium">Total Profit</h3>
           </div>
-          <p className="text-3xl font-bold text-white">$1,240.50</p>
-          <p className="text-sm text-emerald-400 mt-1">+12.5% this month</p>
+          <p className={`text-3xl font-bold ${stats && stats.net_profit >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+            {stats ? `$${Math.abs(stats.net_profit).toFixed(2)}` : '$0.00'}
+          </p>
+          <p className="text-sm text-slate-500 mt-1">
+            {stats ? `${stats.net_profit >= 0 ? '+' : ''}${stats.net_profit.toFixed(2)} all time` : 'Start betting to see stats'}
+          </p>
         </div>
         <div className="bg-slate-800/50 backdrop-blur p-6 rounded-2xl border border-slate-700/50">
           <div className="flex items-center gap-4 mb-2">
@@ -126,7 +138,7 @@ export default function Dashboard() {
             </div>
             <h3 className="text-slate-400 font-medium">Avg. Edge</h3>
           </div>
-          <p className="text-3xl font-bold text-white">4.8%</p>
+          <p className="text-3xl font-bold text-white">{avgEdge}%</p>
           <p className="text-sm text-purple-400 mt-1">High value detected</p>
         </div>
       </div>
