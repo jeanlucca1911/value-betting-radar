@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useLiveOdds } from '@/hooks/useLiveOdds';
 import { OddsTable } from '@/components/OddsTable';
 import { LeagueSelector } from '@/components/LeagueSelector';
+import { RegionSelector } from '@/components/RegionSelector';
 import { LoadingSkeleton, EmptyState } from '@/components/LoadingStates';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/Button';
@@ -15,7 +16,8 @@ import { usePortfolioStats } from '@/hooks/usePortfolioStats';
 
 export default function Dashboard() {
   const [sport, setSport] = useState("soccer_epl");
-  const { data, error, isLoading } = useLiveOdds(sport);
+  const [region, setRegion] = useState("uk");
+  const { data, error, isLoading } = useLiveOdds(sport, region);
   const { stats } = usePortfolioStats();
 
   // Calculate average edge from live data if available
@@ -161,7 +163,10 @@ export default function Dashboard() {
           </Button>
         </div>
 
-        <LeagueSelector selectedLeague={sport} onSelect={setSport} />
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <LeagueSelector selectedLeague={sport} onSelect={setSport} />
+          <RegionSelector selectedRegion={region} onSelect={setRegion} />
+        </div>
 
         {error ? (
           <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-6 text-center">

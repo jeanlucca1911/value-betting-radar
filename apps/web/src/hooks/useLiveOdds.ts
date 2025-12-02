@@ -17,9 +17,9 @@ export interface ValueBet {
     affiliate_url?: string; // Added for monetization
 }
 
-export function useLiveOdds(sportKey: string = "soccer_epl") {
+export function useLiveOdds(sportKey: string = "soccer_epl", region: string = "uk") {
     const { data, error, isLoading } = useSWR<ValueBet[]>(
-        `/odds/live?sport=${sportKey}`,
+        `/odds/live?sport=${sportKey}&region=${region}`,
         fetcher,
         {
             refreshInterval: 60000, // Poll every 60 seconds (1 minute)
