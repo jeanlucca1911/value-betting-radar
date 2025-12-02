@@ -98,6 +98,14 @@ class OddsService:
                         if edge > 0.10:
                             is_steam_move = True
 
+                        # Calculate Kelly Criterion stake
+                        kelly_result = PowerMethod.calculate_kelly_stake(
+                            odds=outcome.price,
+                            true_prob=true_prob,
+                            bankroll=1000.0,  # Default $1000 bankroll (TODO: fetch from user profile)
+                            fractional_kelly=0.25  # Quarter Kelly for safety
+                        )
+
                         value_bets.append(ValueBet(
                             match_id=match.id,
                             home_team=match.home_team,
@@ -111,7 +119,9 @@ class OddsService:
                             edge=round(edge * 100, 2),
                             expected_value=round(edge * 100, 2),
                             affiliate_url=affiliate_url,
-                            is_steam_move=is_steam_move
+                            is_steam_move=is_steam_move,
+                            kelly_percentage=kelly_result["kelly_percentage"],
+                            recommended_stake=kelly_result["recommended_stake"]
                         ))
         
         return sorted(value_bets, key=lambda x: x.edge, reverse=True)

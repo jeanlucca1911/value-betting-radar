@@ -51,6 +51,8 @@ class ValueBet(BaseModel):
     affiliate_url: Optional[str] = None
     is_steam_move: bool = False
     previous_odds: Optional[float] = None
+    kelly_percentage: float = 0.0
+    recommended_stake: float = 0.0
 
 class BetRequest(BaseModel):
     match_id: str

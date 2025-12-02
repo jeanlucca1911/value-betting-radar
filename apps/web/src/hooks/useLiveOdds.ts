@@ -16,6 +16,8 @@ export interface ValueBet {
     timestamp: string;
     affiliate_url?: string; // Added for monetization
     is_steam_move?: boolean;
+    kelly_percentage?: number;
+    recommended_stake?: number;
 }
 
 export function useLiveOdds(sportKey: string = "soccer_epl", region: string = "uk") {
