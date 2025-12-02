@@ -49,6 +49,8 @@ class ValueBet(BaseModel):
     expected_value: float
     timestamp: datetime = Field(default_factory=datetime.utcnow)
     affiliate_url: Optional[str] = None
+    is_steam_move: bool = False
+    previous_odds: Optional[float] = None
 
 class BetRequest(BaseModel):
     match_id: str

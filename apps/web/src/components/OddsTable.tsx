@@ -201,26 +201,14 @@ export function OddsTable({ bets, lastUpdate }: Props) {
                             </div>
                             <div className="grid grid-cols-2 gap-4">
                               <div className="bg-slate-900 p-4 rounded-lg border border-slate-700">
-                                <div className="text-xs text-slate-500 mb-1">Expected Value</div>
-                                <div className="font-mono text-2xl text-emerald-400">+{bet.expected_value}%</div>
-                              </div>
-                              <div className="bg-slate-900 p-4 rounded-lg border border-slate-700">
-                                <div className="text-xs text-slate-500 mb-1">Recommended Stake</div>
-                                <div className="font-mono text-2xl text-blue-400">$100</div>
-                                <div className="text-xs text-slate-500 mt-1">Flat betting strategy</div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </td>
-                    </tr>
+                              </tr>
                   )}
-                </Fragment>
-              );
+                            </Fragment>
+                            );
             })}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  );
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  );
 }
