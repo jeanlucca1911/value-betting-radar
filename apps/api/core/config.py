@@ -11,6 +11,7 @@ class Settings(BaseSettings):
     POSTGRES_SERVER: str = "localhost"
     POSTGRES_PORT: str = "5432"
     POSTGRES_DB: str = "value_betting_radar"
+    POSTGRES_URL: Optional[str] = None
     
     # Redis
     REDIS_HOST: str = "localhost"
@@ -44,14 +45,19 @@ class Settings(BaseSettings):
     
     @property
     def SQLALCHEMY_DATABASE_URI(self) -> str:
-        # Using SQLite for local development (no Docker required)
+        if self.POSTGRES_URL:
+            return self.POSTGRES_URL
+        if self.POSTGRES_SERVER and self.POSTGRES_DB:
+            return f"postgresql+asyncpg://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@{self.POSTGRES_SERVER}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
         return "sqlite+aiosqlite:///./sql_app.db"
 
     @property
-    def FINAL_REDIS_URL(self) -> str:
-        if self.REDIS_URL:
-            return self.REDIS_URL
-        return f"redis://{self.REDIS_HOST}:{self.REDIS_PORT}/0"
+    def SYNC_SQLALCHEMY_DATABASE_URI(self) -> str:
+        if self.POSTGRES_URL:
+            return self.POSTGRES_URL.replace("+asyncpg", "")
+        if self.POSTGRES_SERVER and self.POSTGRES_DB:
+            return f"postgresql://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@{self.POSTGRES_SERVER}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
+        return "sqlite:///./sql_app.db"
 
     class Config:
         env_file = ".env"

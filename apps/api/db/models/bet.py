@@ -1,8 +1,6 @@
 from sqlalchemy import Column, Integer, String, Float, Boolean, DateTime
-from sqlalchemy.ext.declarative import declarative_base
 from datetime import datetime
-
-Base = declarative_base()
+from db.session import Base
 
 class Bet(Base):
     __tablename__ = "bets"
