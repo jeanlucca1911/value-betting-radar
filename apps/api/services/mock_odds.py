@@ -19,6 +19,9 @@ class MockOddsService:
             {"key": "williamhill", "title": "William Hill", "is_sharp": False},
             {"key": "unibet", "title": "Unibet", "is_sharp": False},
         ]
+        self._cache = None
+        self._last_update = None
+        self._cache_duration = timedelta(minutes=5)
 
     def _generate_odds(self, is_sharp: bool) -> List[float]:
         # Generate base probabilities summing to ~1
@@ -36,6 +39,10 @@ class MockOddsService:
         return [round(1 / p, 2) for p in vig_probs]
 
     def get_live_matches(self) -> List[Match]:
+        # Return cached data if valid
+        if self._cache and self._last_update and datetime.utcnow() - self._last_update < self._cache_duration:
+            return self._cache
+
         matches = []
         for i in range(5):
             home, away = random.sample(self.teams, 2)
@@ -76,6 +83,9 @@ class MockOddsService:
                 away_team=away,
                 bookmakers=match_bookmakers
             ))
+        
+        self._cache = matches
+        self._last_update = datetime.utcnow()
         return matches
 
     def find_value_bets(self) -> List[ValueBet]:
