@@ -13,14 +13,14 @@ class OddsService:
     async def get_value_bets(self, sport: str = "soccer_epl", region: str = "uk") -> List[ValueBet]:
         # Fallback to mock if no API key
         if not settings.THE_ODDS_API_KEY:
-            return self.mock_service.find_value_bets()
+            return self.mock_service.find_value_bets(sport=sport, region=region)
 
         matches = await self.api_client.get_odds(sport=sport, regions=region)
         
         # If API fails or returns empty (and we have a key), we might want to return empty or fallback.
         # For now, let's fallback to mock if API returns nothing, just to keep the UI alive for the user
         if not matches:
-            return self.mock_service.find_value_bets()
+            return self.mock_service.find_value_bets(sport=sport, region=region)
 
         value_bets = []
         for match in matches:

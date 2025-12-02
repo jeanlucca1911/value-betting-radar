@@ -7,20 +7,58 @@ from services.math import PowerMethod
 
 class MockOddsService:
     def __init__(self):
-        self.teams = [
-            "Arsenal", "Aston Villa", "Bournemouth", "Brentford", "Brighton",
-            "Chelsea", "Crystal Palace", "Everton", "Fulham", "Liverpool",
-            "Luton Town", "Man City", "Man Utd", "Newcastle", "Nottm Forest",
-            "Sheffield Utd", "Tottenham", "West Ham", "Wolves"
-        ]
+        self.sports_data = {
+            "soccer_epl": {
+                "title": "EPL",
+                "teams": [
+                    "Arsenal", "Aston Villa", "Bournemouth", "Brentford", "Brighton",
+                    "Chelsea", "Crystal Palace", "Everton", "Fulham", "Liverpool",
+                    "Luton Town", "Man City", "Man Utd", "Newcastle", "Nottm Forest",
+                    "Sheffield Utd", "Tottenham", "West Ham", "Wolves"
+                ]
+            },
+            "basketball_nba": {
+                "title": "NBA",
+                "teams": [
+                    "Boston Celtics", "Brooklyn Nets", "New York Knicks", "Philadelphia 76ers", "Toronto Raptors",
+                    "Chicago Bulls", "Cleveland Cavaliers", "Detroit Pistons", "Indiana Pacers", "Milwaukee Bucks",
+                    "Denver Nuggets", "Minnesota Timberwolves", "Oklahoma City Thunder", "Portland Trail Blazers", "Utah Jazz",
+                    "Golden State Warriors", "LA Clippers", "Los Angeles Lakers", "Phoenix Suns", "Sacramento Kings"
+                ]
+            },
+            "americanfootball_nfl": {
+                "title": "NFL",
+                "teams": [
+                    "Arizona Cardinals", "Atlanta Falcons", "Baltimore Ravens", "Buffalo Bills", "Carolina Panthers",
+                    "Chicago Bears", "Cincinnati Bengals", "Cleveland Browns", "Dallas Cowboys", "Denver Broncos",
+                    "Detroit Lions", "Green Bay Packers", "Houston Texans", "Indianapolis Colts", "Jacksonville Jaguars",
+                    "Kansas City Chiefs", "Las Vegas Raiders", "Los Angeles Chargers", "Los Angeles Rams", "Miami Dolphins"
+                ]
+            },
+            "mma_mixed_martial_arts": {
+                "title": "MMA",
+                "teams": [
+                    "Jon Jones", "Stipe Miocic", "Islam Makhachev", "Charles Oliveira", "Alex Pereira",
+                    "Israel Adesanya", "Sean O'Malley", "Marlon Vera", "Leon Edwards", "Colby Covington"
+                ]
+            },
+            "tennis_atp_wimbledon": {
+                "title": "Tennis",
+                "teams": [
+                    "Novak Djokovic", "Carlos Alcaraz", "Daniil Medvedev", "Jannik Sinner", "Andrey Rublev",
+                    "Stefanos Tsitsipas", "Alexander Zverev", "Holger Rune", "Hubert Hurkacz", "Taylor Fritz"
+                ]
+            }
+        }
+        
         self.bookmakers = [
             {"key": "pinnacle", "title": "Pinnacle", "is_sharp": True},
             {"key": "bet365", "title": "Bet365", "is_sharp": False},
             {"key": "williamhill", "title": "William Hill", "is_sharp": False},
             {"key": "unibet", "title": "Unibet", "is_sharp": False},
         ]
-        self._cache = None
-        self._last_update = None
+        self._cache = {} # Keyed by sport
+        self._last_update = {} # Keyed by sport
         self._cache_duration = timedelta(minutes=5)
 
     def _generate_odds(self, is_sharp: bool) -> List[float]:
@@ -38,14 +76,21 @@ class MockOddsService:
         # Convert to odds
         return [round(1 / p, 2) for p in vig_probs]
 
-    def get_live_matches(self) -> List[Match]:
+    def get_live_matches(self, sport_key: str = "soccer_epl") -> List[Match]:
         # Return cached data if valid
-        if self._cache and self._last_update and datetime.utcnow() - self._last_update < self._cache_duration:
-            return self._cache
+        if sport_key in self._cache and sport_key in self._last_update:
+             if datetime.utcnow() - self._last_update[sport_key] < self._cache_duration:
+                return self._cache[sport_key]
 
+        sport_info = self.sports_data.get(sport_key, self.sports_data["soccer_epl"])
+        teams = sport_info["teams"]
+        
         matches = []
-        for i in range(5):
-            home, away = random.sample(self.teams, 2)
+        # Generate fewer matches for individual sports to avoid duplicates if list is small
+        num_matches = 3 if len(teams) < 10 else 5
+        
+        for i in range(num_matches):
+            home, away = random.sample(teams, 2)
             match_id = f"match_{i}_{home}_{away}".replace(" ", "").lower()
             
             match_bookmakers = []
@@ -67,6 +112,10 @@ class MockOddsService:
                     Outcome(name=away, price=odds[2]),
                 ]
                 
+                # For 2-way sports (Tennis, MMA, etc.), remove Draw if needed, 
+                # but for simplicity in mock we keep 3-way or just ignore draw logic for now.
+                # A better mock would check sport type.
+                
                 match_bookmakers.append(Bookmaker(
                     key=bookie["key"],
                     title=bookie["title"],
@@ -76,20 +125,20 @@ class MockOddsService:
 
             matches.append(Match(
                 id=match_id,
-                sport_key="soccer_epl",
-                sport_title="EPL",
+                sport_key=sport_key,
+                sport_title=sport_info["title"],
                 commence_time=datetime.utcnow() + timedelta(hours=random.randint(1, 24)),
                 home_team=home,
                 away_team=away,
                 bookmakers=match_bookmakers
             ))
         
-        self._cache = matches
-        self._last_update = datetime.utcnow()
+        self._cache[sport_key] = matches
+        self._last_update[sport_key] = datetime.utcnow()
         return matches
 
-    def find_value_bets(self) -> List[ValueBet]:
-        matches = self.get_live_matches()
+    def find_value_bets(self, sport: str = "soccer_epl", region: str = "uk") -> List[ValueBet]:
+        matches = self.get_live_matches(sport_key=sport)
         value_bets = []
 
         for match in matches:
