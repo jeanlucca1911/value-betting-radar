@@ -24,33 +24,62 @@ class OddsService:
 
         value_bets = []
         for match in matches:
-            # Find Pinnacle (sharp)
-            pinnacle = next((b for b in match.bookmakers if b.key == "pinnacle"), None)
-            if not pinnacle: continue
-                
-            pinnacle_market = next((m for m in pinnacle.markets if m.key == MarketType.H2H), None)
-            if not pinnacle_market: continue
-
-            sharp_odds = [o.price for o in pinnacle_market.outcomes]
-            true_probs = PowerMethod.calculate_true_probabilities(sharp_odds)
+            # 1. Calculate Consensus True Probability (Weighted Average)
+            # We need to aggregate odds for each outcome across all bookmakers
             
-            if not true_probs: continue
-
+            # Structure: { "Home Team": [ {price: 2.5, weight: 5.0}, ... ], "Away Team": ... }
+            outcome_odds = {}
+            
             for bookie in match.bookmakers:
-                if bookie.key == "pinnacle": continue
+                market = next((m for m in bookie.markets if m.key == MarketType.H2H), None)
+                if not market: continue
+                
+                weight = settings.BOOKMAKER_WEIGHTS.get(bookie.key, settings.BOOKMAKER_WEIGHTS["default"])
+                
+                for outcome in market.outcomes:
+                    if outcome.name not in outcome_odds:
+                        outcome_odds[outcome.name] = []
+                    outcome_odds[outcome.name].append({"price": outcome.price, "weight": weight})
+
+            # Calculate weighted probability for each outcome
+            consensus_probs = {}
+            for outcome_name, prices in outcome_odds.items():
+                total_weight = sum(p["weight"] for p in prices)
+                if total_weight == 0: continue
+                
+                # Weighted average of implied probabilities (1/odds)
+                weighted_sum_prob = sum((1/p["price"]) * p["weight"] for p in prices)
+                consensus_probs[outcome_name] = weighted_sum_prob / total_weight
+
+            # Normalize probabilities to sum to 1 (remove vig from the consensus)
+            total_prob = sum(consensus_probs.values())
+            if total_prob == 0: continue
+            
+            true_probs = {k: v/total_prob for k, v in consensus_probs.items()}
+
+            # 2. Find Value Bets
+            for bookie in match.bookmakers:
                 market = next((m for m in bookie.markets if m.key == MarketType.H2H), None)
                 if not market: continue
 
-                for i, outcome in enumerate(market.outcomes):
-                    # Match outcome index (assuming same order, which is risky in prod but ok for MVP)
-                    # Better: match by name
-                    
-                    # Simple matching by index for H2H (Home, Away, Draw)
-                    if i >= len(true_probs): continue
+                for outcome in market.outcomes:
+                    true_prob = true_probs.get(outcome.name)
+                    if not true_prob: continue
 
-                    edge = PowerMethod.calculate_edge(outcome.price, true_probs[i])
+                    edge = PowerMethod.calculate_edge(outcome.price, true_prob)
                     
                     if edge > 0.01: # 1% edge
+                        # Generate affiliate URL
+                        affiliate_url = None
+                        if "bet365" in bookie.key.lower():
+                            affiliate_url = settings.BET365_AFFILIATE_URL
+                        elif "williamhill" in bookie.key.lower():
+                            affiliate_url = settings.WILLIAMHILL_AFFILIATE_URL
+                        elif "unibet" in bookie.key.lower():
+                            affiliate_url = settings.UNIBET_AFFILIATE_URL
+                        elif "pinnacle" in bookie.key.lower():
+                            affiliate_url = settings.PINNACLE_AFFILIATE_URL
+
                         value_bets.append(ValueBet(
                             match_id=match.id,
                             home_team=match.home_team,
@@ -60,9 +89,10 @@ class OddsService:
                             market="Head to Head",
                             outcome=outcome.name,
                             odds=outcome.price,
-                            true_probability=true_probs[i],
+                            true_probability=round(true_prob, 4),
                             edge=round(edge * 100, 2),
-                            expected_value=round(edge * 100, 2) # Simplified EV
+                            expected_value=round(edge * 100, 2),
+                            affiliate_url=affiliate_url
                         ))
         
         return sorted(value_bets, key=lambda x: x.edge, reverse=True)

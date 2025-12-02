@@ -27,6 +27,16 @@ class Settings(BaseSettings):
     UNIBET_AFFILIATE_URL: Optional[str] = "https://www.unibet.com"
     PINNACLE_AFFILIATE_URL: Optional[str] = "https://www.pinnacle.com"
 
+    # Bookmaker Weights (for True Odds Calculation)
+    BOOKMAKER_WEIGHTS: dict = {
+        "pinnacle": 5.0,
+        "betfair": 4.0,
+        "betisn": 3.0,
+        "bet365": 1.5,
+        "williamhill": 1.2,
+        "default": 1.0
+    }
+
     # Security
     SECRET_KEY: str = "your-super-secret-key-change-in-production"
     ALGORITHM: str = "HS256"
