@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { NavBar } from "@/components/NavBar";
+import { ParlayProvider } from "@/context/ParlayContext";
+import { ParlaySlip } from "@/components/ParlaySlip";
+import { Footer } from "@/components/Footer";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -9,9 +12,6 @@ export const metadata: Metadata = {
   title: "Value Betting Radar",
   description: "Detect and exploit market inefficiencies in soccer betting.",
 };
-
-import { ParlayProvider } from "@/context/ParlayContext";
-import { ParlaySlip } from "@/components/ParlaySlip";
 
 export default function RootLayout({
   children,
@@ -25,6 +25,7 @@ export default function RootLayout({
           <NavBar />
           <main className="max-w-7xl mx-auto p-8">{children}</main>
           <ParlaySlip />
+          <Footer />
         </ParlayProvider>
       </body>
     </html>
