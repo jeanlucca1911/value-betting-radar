@@ -19,6 +19,7 @@ class Settings(BaseSettings):
 
     # The Odds API
     THE_ODDS_API_KEY: Optional[str] = None
+    ODDS_CACHE_MINUTES: int = 15
     
     # Affiliate URLs
     BET365_AFFILIATE_URL: Optional[str] = "https://www.bet365.com"

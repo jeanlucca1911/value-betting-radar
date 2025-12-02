@@ -4,6 +4,9 @@ from core.config import settings
 from core.schemas import Match, Bookmaker, Market, Outcome, MarketType
 from datetime import datetime
 
+import json
+from db.redis import get_redis
+
 class TheOddsApiClient:
     BASE_URL = "https://api.the-odds-api.com/v4"
 
@@ -17,7 +20,22 @@ class TheOddsApiClient:
             print("Warning: No API key provided for The Odds API.")
             return []
 
+        # Try cache first
+        redis = await get_redis()
+        cache_key = f"odds:{sport}:{regions}"
+        
+        if redis:
+            try:
+                cached_data = await redis.get(cache_key)
+                if cached_data:
+                    print(f"Using cached odds for {cache_key}")
+                    data = json.loads(cached_data)
+                    return self._parse_matches(data)
+            except Exception as e:
+                print(f"Redis error: {e}")
+
         try:
+            print(f"Fetching fresh odds from API for {sport}...")
             response = await self.client.get(
                 f"/sports/{sport}/odds",
                 params={
@@ -29,6 +47,18 @@ class TheOddsApiClient:
             )
             response.raise_for_status()
             data = response.json()
+            
+            # Cache the raw response data
+            if redis and data:
+                try:
+                    await redis.setex(
+                        cache_key,
+                        settings.ODDS_CACHE_MINUTES * 60,
+                        json.dumps(data)
+                    )
+                except Exception as e:
+                    print(f"Failed to cache odds: {e}")
+
             return self._parse_matches(data)
         except Exception as e:
             print(f"Error fetching odds: {e}")
