@@ -14,11 +14,30 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+@app.on_event("startup")
+async def startup_event():
+    """Initialize database tables on startup"""
+    print("Starting up... Initializing database...")
+    try:
+        from db.session import async_engine, Base
+        # Import models to ensure they are registered with Base
+        from db.models.user import User
+        from db.models.bet import Bet
+        from db.models.historical import HistoricalMatch, HistoricalOdds
+        
+        async with async_engine.begin() as conn:
+            await conn.run_sync(Base.metadata.create_all)
+        print("✅ Database tables created successfully!")
+    except Exception as e:
+        print(f"⚠️ Database initialization error: {e}")
+        print("Continuing anyway - will use mock data")
+
 @app.get("/")
 async def root():
     return {"message": "Value Betting Radar API is running"}
 
 @app.get("/health")
+@app.get("/api/v1/health")
 async def health_check():
     # Simple health check that doesn't depend on external services
     return {
