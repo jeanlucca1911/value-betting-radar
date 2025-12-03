@@ -201,14 +201,43 @@ export function OddsTable({ bets, lastUpdate }: Props) {
                             </div>
                             <div className="grid grid-cols-2 gap-4">
                               <div className="bg-slate-900 p-4 rounded-lg border border-slate-700">
-                              </tr>
+                                <div className="text-slate-400 text-xs uppercase tracking-wider font-bold mb-1">
+                                  Kelly Stake (0.25x)
+                                </div>
+                                <div className="text-2xl font-bold text-emerald-400">
+                                  ${bet.recommended_stake?.toFixed(2) || '0.00'}
+                                </div>
+                                <div className="text-sm text-slate-400">
+                                  {bet.kelly_percentage?.toFixed(1) || '0.0'}% of bankroll
+                                </div>
+                              </div>
+                              <div className="bg-slate-900 p-4 rounded-lg border border-slate-700">
+                                <div className="text-slate-400 text-xs uppercase tracking-wider font-bold mb-1">
+                                  Market Depth
+                                </div>
+                                <div className="text-sm text-slate-300">
+                                  <div className="flex justify-between mb-1">
+                                    <span>Pinnacle:</span>
+                                    <span className="font-mono">{(1 / bet.true_probability).toFixed(2)}</span>
+                                  </div>
+                                  <div className="flex justify-between">
+                                    <span>Soft Book:</span>
+                                    <span className="font-mono text-emerald-400">{bet.odds.toFixed(2)}</span>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </td>
+                    </tr>
                   )}
-                            </Fragment>
-                            );
+                </Fragment>
+              );
             })}
-                          </tbody>
-                        </table>
-                      </div>
-                    </div>
-                  );
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
 }
