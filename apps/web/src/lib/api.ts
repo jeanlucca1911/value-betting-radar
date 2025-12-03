@@ -1,4 +1,5 @@
 // Use environment variable in production, fallback to Railway backend
+// Force rebuild: 2024-12-02 22:15
 export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://value-betting-radar-production.up.railway.app/api/v1';
 
 export async function fetcher<T>(path: string): Promise<T> {
