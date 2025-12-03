@@ -123,7 +123,6 @@ class OddsService:
                             is_steam_move=is_steam_move,
                             kelly_percentage=kelly_result["kelly_percentage"],
                             recommended_stake=kelly_result["recommended_stake"]
-                            recommended_stake=kelly_result["recommended_stake"]
                         ))
         
         return sorted(value_bets, key=lambda x: x.edge, reverse=True)
