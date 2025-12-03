@@ -46,6 +46,12 @@ class TheOddsApiClient:
                 }
             )
             response.raise_for_status()
+            
+            # Log quota usage
+            remaining = response.headers.get("x-requests-remaining")
+            used = response.headers.get("x-requests-used")
+            print(f"API Request Successful. Used: {used}, Remaining: {remaining}")
+            
             data = response.json()
             
             # Cache the raw response data
