@@ -26,7 +26,7 @@ export function useLiveOdds(sportKey: string = "soccer_epl", region: string = "u
         `odds/live?sport=${sportKey}&region=${region}`,
         fetcher,
         {
-            refreshInterval: 60000, // Poll every 60 seconds (1 minute)
+            refreshInterval: 900000, // Poll every 15 minutes to save API credits
             revalidateOnFocus: false, // Prevent aggressive refreshing
         }
     );
