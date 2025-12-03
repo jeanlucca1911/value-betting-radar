@@ -187,3 +187,49 @@ class MockOddsService:
                         ))
         
         return sorted(value_bets, key=lambda x: x.edge, reverse=True)
+
+    def get_player_props(self, sport: str = "soccer_epl", region: str = "uk") -> List[dict]:
+        # Mock player props
+        sport_info = self.sports_data.get(sport, self.sports_data["soccer_epl"])
+        teams = sport_info["teams"]
+        
+        props = []
+        players = ["Star Player A", "Striker B", "Winger C", "Midfielder D"]
+        
+        for _ in range(10):
+            team = random.choice(teams)
+            player = f"{random.choice(players)} ({team})"
+            odds = round(random.uniform(1.8, 4.5), 2)
+            edge = round(random.uniform(2.0, 15.0), 1)
+            
+            props.append({
+                "player": player,
+                "team": team,
+                "market": "Anytime Goalscorer",
+                "odds": odds,
+                "bookmaker": random.choice(self.bookmakers)["title"],
+                "edge": edge,
+                "match_name": f"{team} vs {random.choice(teams)}"
+            })
+            
+        return sorted(props, key=lambda x: x["edge"], reverse=True)
+
+    def get_correct_scores(self, sport: str = "soccer_epl", region: str = "uk") -> List[dict]:
+        # Mock correct scores
+        scores_list = ["1-0", "2-0", "2-1", "1-1", "0-0", "0-1", "1-2"]
+        scores = []
+        
+        for _ in range(10):
+            score = random.choice(scores_list)
+            odds = round(random.uniform(5.0, 15.0), 2)
+            edge = round(random.uniform(5.0, 25.0), 1)
+            
+            scores.append({
+                "score": score,
+                "odds": odds,
+                "bookmaker": random.choice(self.bookmakers)["title"],
+                "edge": edge,
+                "match_name": "Mock Match"
+            })
+            
+        return sorted(scores, key=lambda x: x["edge"], reverse=True)

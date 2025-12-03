@@ -24,7 +24,11 @@ async def get_player_props(
     """
     Get player prop value bets (Anytime Goalscorer).
     """
-    return await odds_service.get_player_props(sport=sport, region=region)
+    try:
+        return await odds_service.get_player_props(sport=sport, region=region)
+    except Exception as e:
+        print(f"Error fetching player props: {e}")
+        return []
 
 @router.get("/scores")
 async def get_correct_scores(
@@ -34,4 +38,8 @@ async def get_correct_scores(
     """
     Get correct score value bets.
     """
-    return await odds_service.get_correct_scores(sport=sport, region=region)
+    try:
+        return await odds_service.get_correct_scores(sport=sport, region=region)
+    except Exception as e:
+        print(f"Error fetching correct scores: {e}")
+        return []
