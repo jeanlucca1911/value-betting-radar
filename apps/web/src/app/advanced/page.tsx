@@ -45,12 +45,9 @@ export default function AdvancedMarketsPage() {
             <div className="text-center mb-12">
                 <h1 className="text-4xl font-bold text-slate-100 mb-4">
                     Advanced Markets <span className="text-emerald-400">Radar</span>
-                    <span className="ml-3 px-3 py-1 bg-emerald-500/20 text-emerald-400 text-xs rounded-full border border-emerald-500/30 align-middle">BETA</span>
                 </h1>
                 <p className="text-slate-400 text-lg">
                     Find value in player props, correct scores, and build +EV parlays.
-                    <br />
-                    <span className="text-sm text-slate-500">(Currently showing demo data for testing)</span>
                 </p>
             </div>
 
@@ -100,7 +97,7 @@ export default function AdvancedMarketsPage() {
                                             <div className="text-2xl font-bold text-emerald-400">{prop.odds}</div>
                                         </div>
                                         <button
-                                            onClick={() => alert(`✅ Added to slip: ${prop.player} - ${prop.market} @ ${prop.odds}\n\n(Demo Mode: Bet not actually placed)`)}
+                                            onClick={() => alert('Parlay Builder coming soon! This will add the bet to your slip.')}
                                             className="w-full mt-4 py-2 bg-emerald-600/10 hover:bg-emerald-600 text-emerald-400 hover:text-white rounded-lg text-sm font-semibold transition-colors"
                                         >
                                             Add to Slip
@@ -149,7 +146,7 @@ export default function AdvancedMarketsPage() {
                                             <div className="text-2xl font-bold text-purple-400">{score.odds}</div>
                                         </div>
                                         <button
-                                            onClick={() => alert(`✅ Added to slip: Correct Score ${score.score} @ ${score.odds}\n\n(Demo Mode: Bet not actually placed)`)}
+                                            onClick={() => alert('Parlay Builder coming soon! This will add the bet to your slip.')}
                                             className="w-full mt-4 py-2 bg-purple-600/10 hover:bg-purple-600 text-purple-400 hover:text-white rounded-lg text-sm font-semibold transition-colors"
                                         >
                                             Add to Slip
