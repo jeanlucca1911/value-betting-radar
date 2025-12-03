@@ -23,7 +23,7 @@ interface PortfolioResponse {
     daily_profits: DailyProfit[];
 }
 
-export const PORTFOLIO_STATS_KEY = `${API_BASE_URL}/bets/stats?user_email=test@example.com`;
+export const PORTFOLIO_STATS_KEY = `bets/stats?user_email=test@example.com`;
 
 export function usePortfolioStats() {
     const { data, error, isLoading } = useSWR<PortfolioResponse>(
