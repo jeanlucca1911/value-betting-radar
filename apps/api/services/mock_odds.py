@@ -48,6 +48,13 @@ class MockOddsService:
                     "Novak Djokovic", "Carlos Alcaraz", "Daniil Medvedev", "Jannik Sinner", "Andrey Rublev",
                     "Stefanos Tsitsipas", "Alexander Zverev", "Holger Rune", "Hubert Hurkacz", "Taylor Fritz"
                 ]
+            },
+            "soccer_uefa_champions_league": {
+                "title": "Champions League",
+                "teams": [
+                    "Man City", "Real Madrid", "Bayern Munich", "PSG", "Arsenal",
+                    "Barcelona", "Inter Milan", "Atletico Madrid", "Dortmund", "Napoli"
+                ]
             }
         }
         
