@@ -5,6 +5,7 @@ import { NavBar } from "@/components/NavBar";
 import { ParlayProvider } from "@/context/ParlayContext";
 import { ParlaySlip } from "@/components/ParlaySlip";
 import { Footer } from "@/components/Footer";
+import { DisclaimerBanner } from "@/components/DisclaimerBanner";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -23,6 +24,7 @@ export default function RootLayout({
       <body className={inter.className}>
         <ParlayProvider>
           <NavBar />
+          <DisclaimerBanner />
           <main className="max-w-7xl mx-auto p-8">{children}</main>
           <ParlaySlip />
           <Footer />

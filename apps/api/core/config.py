@@ -45,17 +45,20 @@ class Settings(BaseSettings):
     
     @property
     def SQLALCHEMY_DATABASE_URI(self) -> str:
+        # Use SQLite for local development if no Postgres URL is provided
         if self.POSTGRES_URL:
             return self.POSTGRES_URL
-        if self.POSTGRES_SERVER and self.POSTGRES_DB:
+        # Only use Postgres if explicitly configured
+        if self.POSTGRES_SERVER != "localhost" or self.POSTGRES_DB != "value_betting_radar":
             return f"postgresql+asyncpg://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@{self.POSTGRES_SERVER}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
+        # Default to SQLite for local dev
         return "sqlite+aiosqlite:///./sql_app.db"
 
     @property
     def SYNC_SQLALCHEMY_DATABASE_URI(self) -> str:
         if self.POSTGRES_URL:
             return self.POSTGRES_URL.replace("+asyncpg", "")
-        if self.POSTGRES_SERVER and self.POSTGRES_DB:
+        if self.POSTGRES_SERVER != "localhost" or self.POSTGRES_DB != "value_betting_radar":
             return f"postgresql://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@{self.POSTGRES_SERVER}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
         return "sqlite:///./sql_app.db"
 
