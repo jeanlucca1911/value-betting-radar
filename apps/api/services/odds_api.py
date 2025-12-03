@@ -77,7 +77,7 @@ class TheOddsApiClient:
                             for o in market.get("outcomes", [])
                         ]
                         markets.append(Market(
-                            key=MarketType.H2H, # Assuming h2h for now
+                            key=market.get("key", "h2h"),
                             outcomes=outcomes
                         ))
                     

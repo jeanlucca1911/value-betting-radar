@@ -23,7 +23,7 @@ class Bookmaker(BaseModel):
     markets: List["Market"] = []
 
 class Market(BaseModel):
-    key: MarketType
+    key: str
     outcomes: List[Outcome]
 
 class Match(BaseModel):
