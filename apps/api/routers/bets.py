@@ -73,14 +73,20 @@ async def get_portfolio_stats(
     pending_bets = total_bets - settled_bets
     total_staked = sum(bet.stake for bet in bets)
     
-    # Calculate returns (simplified: using potential_return for won bets)
+    # Calculate returns (only for settled bets)
+    settled_bets_list = [b for b in bets if b.status in ["won", "lost"]]
+    settled_staked = sum(b.stake for b in settled_bets_list)
+    
     total_returned = sum(
-        bet.potential_return for bet in bets if bet.status == "won"
+        bet.potential_return for bet in settled_bets_list if bet.status == "won"
     )
     
-    net_profit = total_returned - total_staked
-    roi = (net_profit / total_staked * 100) if total_staked > 0 else 0.0
-    win_rate = (sum(1 for bet in bets if bet.status == "won") / settled_bets * 100) if settled_bets > 0 else 0.0
+    # Net profit is total returned - total staked (on settled bets only)
+    net_profit = total_returned - settled_staked
+    
+    # ROI based on settled turnover
+    roi = (net_profit / settled_staked * 100) if settled_staked > 0 else 0.0
+    win_rate = (sum(1 for bet in settled_bets_list if bet.status == "won") / len(settled_bets_list) * 100) if settled_bets_list else 0.0
     
     # Calculate daily profits
     daily_data = {}
