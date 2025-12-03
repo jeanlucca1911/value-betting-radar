@@ -49,6 +49,12 @@ export function OddsTable({ bets, lastUpdate }: Props) {
             <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
             {bets.length} Opportunities
           </span>
+          {bets.some(b => b.is_mock) && (
+            <span className="px-3 py-1 text-xs bg-blue-500/20 text-blue-400 rounded-full border border-blue-500/30 flex items-center gap-2">
+              <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
+              SIMULATED DATA
+            </span>
+          )}
         </div>
         {lastUpdate && (
           <div className="text-sm text-slate-500">

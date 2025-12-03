@@ -20,6 +20,7 @@ class OddsService:
         # If API fails or returns empty (and we have a key), we might want to return empty or fallback.
         # For now, let's fallback to mock if API returns nothing, just to keep the UI alive for the user
         if not matches:
+            print(f"API returned 0 matches for {sport}. Falling back to mock data.")
             return self.mock_service.find_value_bets(sport=sport, region=region)
 
         value_bets = []

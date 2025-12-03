@@ -28,33 +28,16 @@
         </div>
     ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {scores.map((score, i) => (
-                <div key={i} className="bg-slate-800 p-6 rounded-xl border border-slate-700 hover:border-purple-500/50 transition-all group">
-                    <div className="flex justify-between items-start mb-4">
-                        <div>
-                            <h3 className="font-bold text-3xl text-slate-100">{score.score}</h3>
-                            <p className="text-sm text-slate-400">Exact Score</p>
-                        </div>
-                        <span className="px-2 py-1 bg-purple-500/20 text-purple-400 text-xs rounded border border-purple-500/30">
-                            +{score.edge}% Edge
-                        </span>
-                    </div>
-                    <div className="flex justify-between items-end">
-                        <div>
-                            <p className="text-xs text-slate-500 uppercase mb-1">Bookmaker</p>
-                            <p className="text-sm text-slate-300">{score.bookmaker}</p>
-                        </div>
-                        <div className="text-2xl font-bold text-purple-400">{score.odds}</div>
-                    </div>
-                    <button
-                        onClick={() => alert('Parlay Builder coming soon! This will add the bet to your slip.')}
-                        className="w-full mt-4 py-2 bg-purple-600/10 hover:bg-purple-600 text-purple-400 hover:text-white rounded-lg text-sm font-semibold transition-colors"
-                    >
-                        Add to Slip
-                    </button>
-                </div>
-            ))}
+            <button
+                onClick={() => alert('Parlay Builder coming soon! This will add the bet to your slip.')}
+                className="w-full mt-4 py-2 bg-purple-600/10 hover:bg-purple-600 text-purple-400 hover:text-white rounded-lg text-sm font-semibold transition-colors"
+            >
+                Add to Slip
+            </button>
         </div>
+    ))
+}
+        </div >
     )
 }
         </div >

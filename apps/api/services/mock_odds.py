@@ -190,7 +190,8 @@ class MockOddsService:
                             true_probability=round(true_probs[i], 4),
                             edge=round(edge * 100, 2), # Percentage
                             expected_value=round(edge * 100, 2),
-                            affiliate_url=get_affiliate_url(bookie.title)
+                            affiliate_url=get_affiliate_url(bookie.title),
+                            is_mock=True
                         ))
         
         return sorted(value_bets, key=lambda x: x.edge, reverse=True)

@@ -53,6 +53,7 @@ class ValueBet(BaseModel):
     previous_odds: Optional[float] = None
     kelly_percentage: float = 0.0
     recommended_stake: float = 0.0
+    is_mock: bool = False
 
 class BetRequest(BaseModel):
     match_id: str

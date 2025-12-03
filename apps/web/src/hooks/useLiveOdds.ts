@@ -18,6 +18,7 @@ export interface ValueBet {
     is_steam_move?: boolean;
     kelly_percentage?: number;
     recommended_stake?: number;
+    is_mock?: boolean;
 }
 
 export function useLiveOdds(sportKey: string = "soccer_epl", region: string = "uk") {
