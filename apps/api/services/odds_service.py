@@ -123,8 +123,11 @@ class OddsService:
                             is_steam_move=is_steam_move,
                             kelly_percentage=kelly_result["kelly_percentage"],
                             recommended_stake=kelly_result["recommended_stake"]
+                            recommended_stake=kelly_result["recommended_stake"]
                         ))
         
+        return sorted(value_bets, key=lambda x: x.edge, reverse=True)
+
     async def get_player_props(self, sport: str = "soccer_epl", region: str = "uk") -> List[dict]:
         # Fallback to mock if no API key
         if not settings.THE_ODDS_API_KEY:
