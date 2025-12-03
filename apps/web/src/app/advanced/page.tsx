@@ -65,8 +65,8 @@ export default function AdvancedMarketsPage() {
                         </p>
                     </div>
                     <LeagueSelector
-                        selectedSport={selectedSport}
-                        onSportChange={setSelectedSport}
+                        selectedLeague={selectedSport}
+                        onSelect={setSelectedSport}
                     />
                 </div>
 
