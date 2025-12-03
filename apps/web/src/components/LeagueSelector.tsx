@@ -10,7 +10,7 @@ interface LeagueSelectorProps {
 
 const LEAGUES = [
     { id: "soccer_epl", name: "Premier League", icon: "⚽" },
-    { id: "soccer_uefa_champs_league", name: "Champions League", icon: "🏆" },
+    { id: "soccer_uefa_champions_league", name: "Champions League", icon: "🏆" },
     { id: "basketball_nba", name: "NBA", icon: "🏀" },
     { id: "americanfootball_nfl", name: "NFL", icon: "🏈" },
     { id: "mma_mixed_martial_arts", name: "MMA", icon: "🥊" },
