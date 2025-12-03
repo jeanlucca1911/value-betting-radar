@@ -5,7 +5,7 @@ import { NavBar } from "@/components/NavBar";
 import { ParlayProvider } from "@/context/ParlayContext";
 import { ParlaySlip } from "@/components/ParlaySlip";
 import { Footer } from "@/components/Footer";
-import { DisclaimerBanner } from "@/components/DisclaimerBanner";
+import DisclaimerBanner from "@/components/DisclaimerBanner";
 
 const inter = Inter({ subsets: ["latin"] });
 
