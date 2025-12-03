@@ -12,9 +12,8 @@ app.add_middleware(
         "http://localhost:3000",
         "https://valuebettingradar.com",
         "https://www.valuebettingradar.com",
-        "https://value-betting-radar.vercel.app",
-        "https://value-betting-radar-git-master-jeanlucca1911s-projects.vercel.app"
     ],
+    allow_origin_regex=r"https://.*\.vercel\.app",  # Allow all Vercel preview URLs
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
