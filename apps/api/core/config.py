@@ -47,6 +47,8 @@ class Settings(BaseSettings):
     def SQLALCHEMY_DATABASE_URI(self) -> str:
         # Use SQLite for local development if no Postgres URL is provided
         if self.POSTGRES_URL:
+            if self.POSTGRES_URL.startswith("postgresql://"):
+                return self.POSTGRES_URL.replace("postgresql://", "postgresql+asyncpg://", 1)
             return self.POSTGRES_URL
         # Only use Postgres if explicitly configured
         if self.POSTGRES_SERVER != "localhost" or self.POSTGRES_DB != "value_betting_radar":
