@@ -21,32 +21,10 @@ export function OddsTable({ bets, lastUpdate }: Props) {
     setExpandedBetId(expandedBetId === id ? null : id);
   };
 
-  const placeBet = async (bet: ValueBet) => {
-    try {
-      const res = await fetch(`${API_BASE_URL}/bets/place`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          match_id: bet.match_id,
-          home_team: bet.home_team,
-          away_team: bet.away_team,
-          selection: bet.outcome,
-          odds: bet.odds,
-          stake: 100,
-          bookmaker: bet.bookmaker,
-          edge: bet.edge,
-        }),
-      });
-      if (res.ok) {
-        alert(`Bet tracked! ${bet.outcome} @ ${bet.odds}`);
-        mutate(); // Refresh stats immediately
-      } else {
-        alert("Failed to track bet");
-      }
-    } catch (e) {
-      console.error(e);
-      alert("Error tracking bet");
-    }
+  const trackBet = (bet: ValueBet) => {
+    // Just show visual confirmation - don't save to database
+    // Users should use "BET NOW" to actually place bets
+    alert(`✅ Bet noted! ${bet.outcome} @ ${bet.odds}\n\nThis is for tracking only. Click "BET NOW" to place the actual bet.`);
   };
 
   const getEdgeColor = (edge: number) => {
@@ -160,7 +138,7 @@ export function OddsTable({ bets, lastUpdate }: Props) {
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
-                            placeBet(bet);
+                            trackBet(bet);
                           }}
                           className="bg-slate-700 hover:bg-slate-600 text-slate-300 px-3 py-2 rounded-md text-xs font-medium transition-colors"
                           title="Track as Paper Bet"

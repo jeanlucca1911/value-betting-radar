@@ -16,28 +16,32 @@ export default function AdvancedMarketsPage() {
 
     const fetchProps = async () => {
         setLoading(true);
-        // In a real app, we'd first fetch live games, let user select one, then fetch props
-        // For MVP, we'll simulate or use a hardcoded game ID if available from live odds
-        setTimeout(() => {
-            setProps([
-                { player: "Bukayo Saka", team: "Arsenal", market: "Anytime Goalscorer", odds: 2.8, bookmaker: "Betfair", edge: 12.5 },
-                { player: "Gabriel Martinelli", team: "Arsenal", market: "Anytime Goalscorer", odds: 3.2, bookmaker: "William Hill", edge: 8.4 },
-                { player: "Erling Haaland", team: "Man City", market: "Anytime Goalscorer", odds: 1.8, bookmaker: "Pinnacle", edge: 3.1 },
-            ]);
+        try {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1'}/odds/props?sport=${sportKey}`);
+            if (!res.ok) throw new Error('Failed to fetch props');
+            const data = await res.json();
+            setProps(data);
+        } catch (e) {
+            console.error(e);
+            alert('Failed to load player props. Please try again.');
+        } finally {
             setLoading(false);
-        }, 1000);
+        }
     };
 
     const fetchScores = async () => {
         setLoading(true);
-        setTimeout(() => {
-            setScores([
-                { score: "2-1", odds: 8.5, bookmaker: "Bet365", edge: 15.2 },
-                { score: "1-0", odds: 6.0, bookmaker: "Unibet", edge: 5.8 },
-                { score: "3-1", odds: 14.0, bookmaker: "Betfair", edge: 22.1 },
-            ]);
+        try {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1'}/odds/scores?sport=${sportKey}`);
+            if (!res.ok) throw new Error('Failed to fetch scores');
+            const data = await res.json();
+            setScores(data);
+        } catch (e) {
+            console.error(e);
+            alert('Failed to load correct scores. Please try again.');
+        } finally {
             setLoading(false);
-        }, 1000);
+        }
     };
 
     return (

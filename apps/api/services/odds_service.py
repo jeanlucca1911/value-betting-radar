@@ -124,4 +124,68 @@ class OddsService:
                             recommended_stake=kelly_result["recommended_stake"]
                         ))
         
-        return sorted(value_bets, key=lambda x: x.edge, reverse=True)
+    async def get_player_props(self, sport: str = "soccer_epl", region: str = "uk") -> List[dict]:
+        # Fallback to mock if no API key
+        if not settings.THE_ODDS_API_KEY:
+            return self.mock_service.get_player_props(sport=sport, region=region)
+
+        # Fetch player props (Anytime Goalscorer)
+        matches = await self.api_client.get_odds(sport=sport, regions=region, markets="player_goal_scorer_anytime")
+        
+        if not matches:
+            return self.mock_service.get_player_props(sport=sport, region=region)
+
+        props = []
+        for match in matches:
+            for bookie in match.bookmakers:
+                # Find the goalscorer market
+                market = next((m for m in bookie.markets if m.key == "player_goal_scorer_anytime"), None)
+                if not market: continue
+                
+                for outcome in market.outcomes:
+                    # Simple value detection (mock logic for now as we need true probs)
+                    # In reality, we'd compare against a sharp bookie like Pinnacle
+                    # For MVP, let's just return the data so it's "real" odds
+                    
+                    props.append({
+                        "player": outcome.name,
+                        "team": match.home_team if outcome.name in match.home_team else match.away_team, # Heuristic
+                        "market": "Anytime Goalscorer",
+                        "odds": outcome.price,
+                        "bookmaker": bookie.title,
+                        "edge": 0.0, # We need a model to calculate edge for props
+                        "match_name": f"{match.home_team} vs {match.away_team}"
+                    })
+        
+        # Sort by odds for now
+        return sorted(props, key=lambda x: x["odds"])[:20] # Return top 20
+
+    async def get_correct_scores(self, sport: str = "soccer_epl", region: str = "uk") -> List[dict]:
+        # Fallback to mock if no API key
+        if not settings.THE_ODDS_API_KEY:
+            return self.mock_service.get_correct_scores(sport=sport, region=region)
+
+        # Fetch correct scores (using h2h for now as correct score is a separate market key usually 'correct_score')
+        # Note: 'correct_score' might consume more quota or be in a different plan.
+        # Let's try to fetch it.
+        matches = await self.api_client.get_odds(sport=sport, regions=region, markets="correct_score") # or h2h if not available
+        
+        if not matches:
+             return self.mock_service.get_correct_scores(sport=sport, region=region)
+
+        scores = []
+        for match in matches:
+            for bookie in match.bookmakers:
+                market = next((m for m in bookie.markets if m.key == "correct_score"), None)
+                if not market: continue
+                
+                for outcome in market.outcomes:
+                    scores.append({
+                        "score": outcome.name,
+                        "odds": outcome.price,
+                        "bookmaker": bookie.title,
+                        "edge": 0.0,
+                        "match_name": f"{match.home_team} vs {match.away_team}"
+                    })
+
+        return sorted(scores, key=lambda x: x["odds"])[:20]

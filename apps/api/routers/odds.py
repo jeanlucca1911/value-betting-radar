@@ -15,3 +15,23 @@ async def get_live_value_bets(
     Get live value bets.
     """
     return await odds_service.get_value_bets(sport=sport, region=region)
+
+@router.get("/props")
+async def get_player_props(
+    sport: str = "soccer_epl",
+    region: str = "uk"
+):
+    """
+    Get player prop value bets (Anytime Goalscorer).
+    """
+    return await odds_service.get_player_props(sport=sport, region=region)
+
+@router.get("/scores")
+async def get_correct_scores(
+    sport: str = "soccer_epl",
+    region: str = "uk"
+):
+    """
+    Get correct score value bets.
+    """
+    return await odds_service.get_correct_scores(sport=sport, region=region)

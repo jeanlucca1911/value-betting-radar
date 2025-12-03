@@ -15,14 +15,14 @@ class TheOddsApiClient:
         self.client = httpx.AsyncClient(base_url=self.BASE_URL, timeout=10.0)
 
 
-    async def get_odds(self, sport: str = "soccer_epl", regions: str = "uk,eu") -> List[Match]:
+    async def get_odds(self, sport: str = "soccer_epl", regions: str = "uk,eu", markets: str = "h2h") -> List[Match]:
         if not self.api_key:
             print("Warning: No API key provided for The Odds API.")
             return []
 
         # Try cache first
         redis = await get_redis()
-        cache_key = f"odds:{sport}:{regions}"
+        cache_key = f"odds:{sport}:{regions}:{markets}"
         
         if redis:
             try:
@@ -30,18 +30,18 @@ class TheOddsApiClient:
                 if cached_data:
                     print(f"Using cached odds for {cache_key}")
                     data = json.loads(cached_data)
-                    return self._parse_matches(data)
+                    return self._parse_matches(data, markets)
             except Exception as e:
                 print(f"Redis error: {e}")
 
         try:
-            print(f"Fetching fresh odds from API for {sport}...")
+            print(f"Fetching fresh odds from API for {sport} ({markets})...")
             response = await self.client.get(
                 f"/sports/{sport}/odds",
                 params={
                     "apiKey": self.api_key,
                     "regions": regions,
-                    "markets": "h2h",
+                    "markets": markets,
                     "oddsFormat": "decimal",
                 }
             )
