@@ -133,62 +133,124 @@ class OddsService:
             return self.mock_service.get_player_props(sport=sport, region=region)
 
         # Fetch player props (Anytime Goalscorer)
-        matches = await self.api_client.get_odds(sport=sport, regions=region, markets="player_goal_scorer_anytime")
+        # Use multiple regions to get more data
+        matches = await self.api_client.get_odds(sport=sport, regions="uk,eu,us,au", markets="player_goal_scorer_anytime")
         
         if not matches:
             return self.mock_service.get_player_props(sport=sport, region=region)
 
         props = []
         for match in matches:
+            # 1. Aggregate odds for each player to find the "Market Average"
+            player_odds_map = {} # { "Haaland": [1.8, 1.9, 1.75], ... }
+            
             for bookie in match.bookmakers:
-                # Find the goalscorer market
                 market = next((m for m in bookie.markets if m.key == "player_goal_scorer_anytime"), None)
                 if not market: continue
                 
                 for outcome in market.outcomes:
-                    # Simple value detection (mock logic for now as we need true probs)
-                    # In reality, we'd compare against a sharp bookie like Pinnacle
-                    # For MVP, let's just return the data so it's "real" odds
-                    
-                    props.append({
-                        "player": outcome.name,
-                        "team": match.home_team if outcome.name in match.home_team else match.away_team, # Heuristic
-                        "market": "Anytime Goalscorer",
-                        "odds": outcome.price,
-                        "bookmaker": bookie.title,
-                        "edge": 0.0, # We need a model to calculate edge for props
-                        "match_name": f"{match.home_team} vs {match.away_team}"
-                    })
+                    if outcome.name not in player_odds_map:
+                        player_odds_map[outcome.name] = []
+                    player_odds_map[outcome.name].append(outcome.price)
+
+            # Calculate Median Odds for each player (Consensus)
+            player_medians = {}
+            for player, odds_list in player_odds_map.items():
+                if len(odds_list) < 2: continue # Need at least 2 bookies to form a consensus
+                odds_list.sort()
+                mid = len(odds_list) // 2
+                player_medians[player] = odds_list[mid]
+
+            # 2. Find Value Bets
+            for bookie in match.bookmakers:
+                market = next((m for m in bookie.markets if m.key == "player_goal_scorer_anytime"), None)
+                if not market: continue
+                
+                for outcome in market.outcomes:
+                    median_price = player_medians.get(outcome.name)
+                    if not median_price: continue
+
+                    # Heuristic: If odds are significantly higher than median
+                    # Edge = (Odds - Median) / Median
+                    # This is a relative value approach.
+                    if outcome.price > median_price:
+                        edge = (outcome.price - median_price) / median_price
+                        
+                        if edge > 0.05: # 5% better than market median
+                            props.append({
+                                "player": outcome.name,
+                                "team": match.home_team if outcome.name in match.home_team else match.away_team, # Heuristic
+                                "market": "Anytime Goalscorer",
+                                "odds": outcome.price,
+                                "bookmaker": bookie.title,
+                                "edge": round(edge * 100, 2),
+                                "match_name": f"{match.home_team} vs {match.away_team}",
+                                "is_mock": False
+                            })
         
-        # Sort by odds for now
-        return sorted(props, key=lambda x: x["odds"])[:20] # Return top 20
+        # Sort by edge
+        return sorted(props, key=lambda x: x["edge"], reverse=True)[:50]
 
     async def get_correct_scores(self, sport: str = "soccer_epl", region: str = "uk") -> List[dict]:
         # Fallback to mock if no API key
         if not settings.THE_ODDS_API_KEY:
             return self.mock_service.get_correct_scores(sport=sport, region=region)
 
-        # Fetch correct scores (using h2h for now as correct score is a separate market key usually 'correct_score')
-        # Note: 'correct_score' might consume more quota or be in a different plan.
-        # Let's try to fetch it.
-        matches = await self.api_client.get_odds(sport=sport, regions=region, markets="correct_score") # or h2h if not available
+        # Fetch correct scores
+        matches = await self.api_client.get_odds(sport=sport, regions="uk,eu,us,au", markets="correct_score")
         
         if not matches:
              return self.mock_service.get_correct_scores(sport=sport, region=region)
 
         scores = []
         for match in matches:
+            # 1. Aggregate odds for Consensus
+            # Structure: { "1-0": [ {price: 7.0, weight: 1.0}, ... ], ... }
+            outcome_odds = {}
+            
             for bookie in match.bookmakers:
                 market = next((m for m in bookie.markets if m.key == "correct_score"), None)
                 if not market: continue
                 
                 for outcome in market.outcomes:
-                    scores.append({
-                        "score": outcome.name,
-                        "odds": outcome.price,
-                        "bookmaker": bookie.title,
-                        "edge": 0.0,
-                        "match_name": f"{match.home_team} vs {match.away_team}"
-                    })
+                    if outcome.name not in outcome_odds:
+                        outcome_odds[outcome.name] = []
+                    outcome_odds[outcome.name].append(outcome.price)
 
-        return sorted(scores, key=lambda x: x["odds"])[:20]
+            # 2. Calculate True Probabilities (Consensus)
+            # Average Implied Probability for each score
+            consensus_probs = {}
+            for score, prices in outcome_odds.items():
+                if not prices: continue
+                # Avg Implied Prob = Avg(1/Odds)
+                avg_implied_prob = sum(1/p for p in prices) / len(prices)
+                consensus_probs[score] = avg_implied_prob
+
+            # Normalize to sum to 1 (True Probabilities)
+            total_implied = sum(consensus_probs.values())
+            if total_implied == 0: continue
+            
+            true_probs = {k: v/total_implied for k, v in consensus_probs.items()}
+
+            # 3. Find Value
+            for bookie in match.bookmakers:
+                market = next((m for m in bookie.markets if m.key == "correct_score"), None)
+                if not market: continue
+                
+                for outcome in market.outcomes:
+                    true_prob = true_probs.get(outcome.name)
+                    if not true_prob: continue
+
+                    edge = PowerMethod.calculate_edge(outcome.price, true_prob)
+                    
+                    if edge > 0.05: # 5% edge
+                        scores.append({
+                            "score": outcome.name,
+                            "odds": outcome.price,
+                            "bookmaker": bookie.title,
+                            "edge": round(edge * 100, 2),
+                            "match_name": f"{match.home_team} vs {match.away_team}",
+                            "is_mock": False
+                        })
+
+        return sorted(scores, key=lambda x: x["edge"], reverse=True)[:50]
