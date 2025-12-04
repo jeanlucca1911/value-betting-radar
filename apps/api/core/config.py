@@ -1,5 +1,11 @@
 from pydantic_settings import BaseSettings
 from typing import Optional
+from pathlib import Path
+
+# Get the directory where this config file is located (apps/api/core)
+CORE_DIR = Path(__file__).parent
+API_DIR = CORE_DIR.parent  # apps/api
+ENV_FILE = API_DIR / ".env"
 
 class Settings(BaseSettings):
     PROJECT_NAME: str = "Value Betting Radar"
@@ -86,7 +92,8 @@ class Settings(BaseSettings):
         return "sqlite:///./sql_app.db"
 
     class Config:
-        env_file = ".env"
+        env_file = str(ENV_FILE)  # Use absolute path to .env
         env_file_encoding = 'utf-8'
+        case_sensitive = True
 
 settings = Settings()
