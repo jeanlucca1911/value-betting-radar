@@ -1,24 +1,24 @@
 ```javascript
 "use client";
 
-import { useState } from 'react';
-import { useLiveOdds } from '@/hooks/useLiveOdds';
-import { ValueBetCard } from "@/components/ValueBetCard";
-import { LeagueSelector } from '@/components/LeagueSelector';
-import { LoadingSkeleton } from '@/components/LoadingStates';
-import { EmptyState } from "@/components/EmptyState";
-import { motion } from 'framer-motion';
-import { Button } from '@/components/ui/Button';
-import { Badge } from '@/components/ui/Badge';
-import { ArrowRight, TrendingUp, ShieldCheck, Zap, Radar } from 'lucide-react';
+import { useState} from 'react';
+import { useLiveOdds} from '@/hooks/useLiveOdds';
+import { ValueBetCard} from "@/components/ValueBetCard";
+import { LeagueSelector} from '@/components/LeagueSelector';
+import { LoadingSkeleton} from '@/components/LoadingStates';
+import { EmptyState} from "@/components/EmptyState";
+import { motion} from 'framer-motion';
+import { Button} from '@/components/ui/Button';
+import { Badge} from '@/components/ui/Badge';
+import { ArrowRight, TrendingUp, ShieldCheck, Zap, Radar} from 'lucide-react';
 import Link from 'next/link';
 
-import { usePortfolioStats } from '@/hooks/usePortfolioStats';
+import { usePortfolioStats} from '@/hooks/usePortfolioStats';
 
 export default function Dashboard() {
   const [sport, setSport] = useState("soccer_epl");
-  const { data, error, isLoading } = useLiveOdds(sport, "us"); // Use "us" region by default
-  const { stats } = usePortfolioStats();
+  const { data, error, isLoading} = useLiveOdds(sport, "us"); // Use "us" region by default
+  const { stats} = usePortfolioStats();
 
   // Calculate average edge from live data if available
   const avgEdge = data && data.length > 0
@@ -37,9 +37,9 @@ export default function Dashboard() {
 
         <div className="relative max-w-5xl mx-auto text-center space-y-8">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
+            initial={{ opacity: 0, y: 20}}
+            animate={{ opacity: 1, y: 0}}
+            transition={{ duration: 0.5}}
             className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-800/50 border border-slate-700 backdrop-blur-sm"
           >
             <Badge variant="success" className="animate-pulse">LIVE</Badge>
@@ -47,9 +47,9 @@ export default function Dashboard() {
           </motion.div>
 
           <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
+            initial={{ opacity: 0, y: 20}}
+            animate={{ opacity: 1, y: 0}}
+            transition={{ duration: 0.5, delay: 0.1}}
             className="text-5xl md:text-7xl font-bold tracking-tight text-white"
           >
             Discover Value. <br />
@@ -59,9 +59,9 @@ export default function Dashboard() {
           </motion.h1>
 
           <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
+            initial={{ opacity: 0, y: 20}}
+            animate={{ opacity: 1, y: 0}}
+            transition={{ duration: 0.5, delay: 0.2}}
             className="text-xl text-slate-400 max-w-2xl mx-auto leading-relaxed"
           >
             Our advanced algorithms scan thousands of markets in real-time to find
@@ -69,9 +69,9 @@ export default function Dashboard() {
           </motion.p>
 
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.3 }}
+            initial={{ opacity: 0, y: 20}}
+            animate={{ opacity: 1, y: 0}}
+            transition={{ duration: 0.5, delay: 0.3}}
             className="flex flex-col sm:flex-row items-center justify-center gap-4"
           >
             <Link href="/advanced">
@@ -89,9 +89,9 @@ export default function Dashboard() {
 
           {/* Trust Signals */}
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5, delay: 0.5 }}
+            initial={{ opacity: 0}}
+            animate={{ opacity: 1}}
+            transition={{ duration: 0.5, delay: 0.5}}
             className="pt-8 flex items-center justify-center gap-8 text-slate-500 text-sm"
           >
             <div className="flex items-center gap-2">
@@ -119,11 +119,11 @@ export default function Dashboard() {
             </div>
             <h3 className="text-slate-400 font-medium">Total Profit</h3>
           </div>
-          <p className={`text-3xl font-bold ${ stats && stats.net_profit >= 0 ? 'text-emerald-400' : 'text-red-400' }`}>
-            {stats ? `$${ Math.abs(stats.net_profit).toFixed(2) }` : '$0.00'}
+          <p className={`text-3xl font-bold ${stats && stats.net_profit >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+            {stats ? `$${Math.abs(stats.net_profit).toFixed(2)}` : '$0.00'}
           </p>
           <p className="text-sm text-slate-500 mt-1">
-            {stats ? `${ stats.net_profit >= 0 ? '+' : '' }${ stats.net_profit.toFixed(2) } all time` : 'Start betting to see stats'}
+            {stats ? `${stats.net_profit >= 0 ? '+' : ''}${stats.net_profit.toFixed(2)} all time` : 'Start betting to see stats'}
           </p>
         </div>
         <div className="bg-slate-800/50 backdrop-blur p-6 rounded-2xl border border-slate-700/50">
