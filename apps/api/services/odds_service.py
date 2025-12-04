@@ -281,11 +281,14 @@ class OddsService:
         
         try:
             # Step 1: Get upcoming events
+            print(f"\n[PLAYER_PROPS] Fetching events for {sport}...")
             events = await self.api_client.get_events(sport=sport, region=region)
             
             if not events:
-                print(f"No events found for {sport}")
+                print(f"[PLAYER_PROPS] ❌ No events found for {sport}")
                 return []
+            
+            print(f"[PLAYER_PROPS] ✓ Found {len(events)} events")
             
             # Limit to first 3 events to conserve API credits
             events = events[:3]
@@ -295,6 +298,7 @@ class OddsService:
             # Step 2: Get prop odds for each event
             for event in events:
                 try:
+                    print(f"\n[PLAYER_PROPS] Fetching props for event: {event.id}")
                     # Get event-specific odds with prop markets
                     event_odds = await self.api_client.get_event_odds(
                         sport=sport,
@@ -303,11 +307,17 @@ class OddsService:
                     )
                     
                     if not event_odds or not event_odds.bookmakers:
+                        print(f"[PLAYER_PROPS] ⚠️ No bookmakers found for event {event.id}")
                         continue
+                    
+                    print(f"[PLAYER_PROPS] ✓ Found {len(event_odds.bookmakers)} bookmakers")
                     
                     match_name = f"{event_odds.home_team} vs {event_odds.away_team}"
                     
                     # Step 3: Process prop markets
+                    market_keys = [m.key for bm in event_odds.bookmakers for m in bm.markets]
+                    print(f"[PLAYER_PROPS] Markets available: {set(market_keys)}")
+                    
                     for bookmaker in event_odds.bookmakers:
                         for market in bookmaker.markets:
                             # Look for player prop markets
@@ -315,6 +325,7 @@ class OddsService:
                                             'player_threes', 'player_blocks', 'player_steals',
                                             'player_points_rebounds_assists', 'player_pass_tds',
                                             'player_rush_yds', 'player_receptions']:
+                                print(f"[PLAYER_PROPS] ✓ Found prop market: {market.key} ({len(market.outcomes)} outcomes)")
                                 
                                 # Group outcomes by player
                                 player_markets = {}

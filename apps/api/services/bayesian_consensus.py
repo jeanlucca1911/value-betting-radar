@@ -129,8 +129,11 @@ class BayesianConsensus:
         Returns:
             BayesianResult with probability and confidence metrics
         """
+        print(f"\n[BAYESIAN] Calculating for {outcome_name} ({home_team} vs {away_team})")
+        print(f"[BAYESIAN] Input odds: {len(bookmaker_odds)} bookmakers")
         # Step 1: Get historical prior
         prior = self._get_historical_prior(sport, home_team, away_team, outcome_name)
+        print(f"[BAYESIAN] Prior: alpha={prior.alpha:.2f}, beta={prior.beta:.2f}, games={prior.total_games}")
         
         # Step 2: Bayesian updating with bookmaker odds
         alpha = prior.alpha
@@ -166,7 +169,7 @@ class BayesianConsensus:
         # 95% credible interval
         credible_interval = beta_dist.interval(0.95, alpha, beta_param)
         
-        return BayesianResult(
+        result = BayesianResult(
             probability=posterior_mean,
             variance=posterior_variance,
             credible_interval=credible_interval,
@@ -174,6 +177,10 @@ class BayesianConsensus:
             beta=beta_param,
             effective_samples=int(alpha + beta_param)
         )
+        
+        print(f"[BAYESIAN] Posterior: prob={result.probability:.4f}, CI=[{result.credible_interval[0]:.4f}, {result.credible_interval[1]:.4f}], confidence={result.confidence_score}")
+        
+        return result
     
     def _get_historical_prior(
         self,
