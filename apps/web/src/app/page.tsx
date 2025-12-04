@@ -119,11 +119,11 @@ export default function Dashboard() {
             </div>
             <h3 className="text-slate-400 font-medium">Total Profit</h3>
           </div>
-          <p className={`text - 3xl font - bold ${ stats && stats.net_profit >= 0 ? 'text-emerald-400' : 'text-red-400' } `}>
-            {stats ? `$${ Math.abs(stats.net_profit).toFixed(2) } ` : '$0.00'}
+          <p className={`text-3xl font-bold {stats && stats.net_profit >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+            {stats ? `${Math.abs(stats.net_profit).toFixed(2)}` : '$0.00'}
           </p>
           <p className="text-sm text-slate-500 mt-1">
-            {stats ? `${ stats.net_profit >= 0 ? '+' : '' }${ stats.net_profit.toFixed(2) } all time` : 'Start betting to see stats'}
+            {stats ? `{stats.net_profit >= 0 ? '+' : '' }{stats.net_profit.toFixed(2) } all time` : 'Start betting to see stats'}
           </p>
         </div>
         <div className="bg-slate-800/50 backdrop-blur p-6 rounded-2xl border border-slate-700/50">
