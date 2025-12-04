@@ -29,13 +29,34 @@ class Settings(BaseSettings):
     PINNACLE_AFFILIATE_URL: Optional[str] = "https://www.pinnacle.com"
 
     # Bookmaker Weights (for True Odds Calculation)
+    # Higher weight = sharper bookmaker (more accurate lines)
     BOOKMAKER_WEIGHTS: dict = {
-        "pinnacle": 5.0,
-        "betfair": 4.0,
+        "pinnacle": 5.0,        # Sharpest book worldwide
+        "betfair": 4.0,         # Exchange, very sharp
         "betisn": 3.0,
+        "draftkings": 3.5,      # Sharp for US sports (NBA, NFL)
+        "fanduel": 3.0,         # Sharp for US sports
         "bet365": 1.5,
         "williamhill": 1.2,
+        "mybookie": 0.8,        # Often soft/recreational
+        "bovada": 1.0,
+        "caesars": 1.3,
+        "betmgm": 1.3,
+        "betrivers": 1.2,
+        "lowvig": 2.0,          # Low-vig books tend to be sharper
         "default": 1.0
+    }
+    
+    # Sport-Specific Edge Thresholds
+    # More efficient markets (NBA) need lower thresholds
+    EDGE_THRESHOLDS: dict = {
+        "basketball_nba": 0.005,      # 0.5% - very efficient market
+        "americanfootball_nfl": 0.008,  # 0.8%
+        "icehockey_nhl": 0.008,       # 0.8%
+        "baseball_mlb": 0.010,        # 1.0%
+        "soccer_epl": 0.010,          # 1.0%
+        "soccer_uefa_champions_league": 0.010,
+        "default": 0.010              # 1.0% for other sports
     }
 
     # Security
@@ -66,5 +87,6 @@ class Settings(BaseSettings):
 
     class Config:
         env_file = ".env"
+        env_file_encoding = 'utf-8'
 
 settings = Settings()

@@ -13,8 +13,6 @@ const LEAGUES = [
     { id: "soccer_uefa_champions_league", name: "Champions League", icon: "🏆" },
     { id: "basketball_nba", name: "NBA", icon: "🏀" },
     { id: "americanfootball_nfl", name: "NFL", icon: "🏈" },
-    { id: "mma_mixed_martial_arts", name: "MMA", icon: "🥊" },
-    { id: "tennis_atp_wimbledon", name: "Tennis", icon: "🎾" },
 ];
 
 export function LeagueSelector({ currentLeague, onLeagueSelect }: LeagueSelectorProps) {

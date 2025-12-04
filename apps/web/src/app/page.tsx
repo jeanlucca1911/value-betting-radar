@@ -1,10 +1,12 @@
+```javascript
 "use client";
 
 import { useState } from 'react';
 import { useLiveOdds } from '@/hooks/useLiveOdds';
-import { OddsTable } from '@/components/OddsTable';
+import { ValueBetCard } from "@/components/ValueBetCard";
 import { LeagueSelector } from '@/components/LeagueSelector';
-import { LoadingSkeleton, EmptyState } from '@/components/LoadingStates';
+import { LoadingSkeleton } from '@/components/LoadingStates';
+import { EmptyState } from "@/components/EmptyState";
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
@@ -117,11 +119,11 @@ export default function Dashboard() {
             </div>
             <h3 className="text-slate-400 font-medium">Total Profit</h3>
           </div>
-          <p className={`text-3xl font-bold ${stats && stats.net_profit >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
-            {stats ? `$${Math.abs(stats.net_profit).toFixed(2)}` : '$0.00'}
+          <p className={`text - 3xl font - bold ${ stats && stats.net_profit >= 0 ? 'text-emerald-400' : 'text-red-400' } `}>
+            {stats ? `$${ Math.abs(stats.net_profit).toFixed(2) } ` : '$0.00'}
           </p>
           <p className="text-sm text-slate-500 mt-1">
-            {stats ? `${stats.net_profit >= 0 ? '+' : ''}${stats.net_profit.toFixed(2)} all time` : 'Start betting to see stats'}
+            {stats ? `${ stats.net_profit >= 0 ? '+' : '' }${ stats.net_profit.toFixed(2) } all time` : 'Start betting to see stats'}
           </p>
         </div>
         <div className="bg-slate-800/50 backdrop-blur p-6 rounded-2xl border border-slate-700/50">
@@ -177,7 +179,7 @@ export default function Dashboard() {
         ) : data && data.length > 0 ? (
           <OddsTable bets={data} />
         ) : (
-          <EmptyState />
+          <EmptyState sport={sport} />
         )}
       </div>
     </div>
