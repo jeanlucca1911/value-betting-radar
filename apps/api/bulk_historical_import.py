@@ -30,7 +30,7 @@ class BulkHistoricalImporter:
     """Import historical odds data in bulk"""
     
     def __init__(self):
-        self.api_client = TheOddsApiClient(api_key=settings.THE_ODDS_API_KEY)
+        self.api_client = TheOddsApiClient()
         self.db_path = Path(__file__).parent / "db" / "historical.db"
         
     async def import_historical_data(self, sports: List[str] = None):

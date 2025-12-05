@@ -103,7 +103,28 @@ class AdvancedEdgeCalculator:
         
         Returns:
             EdgeAnalysis with all components
-        # 5. Historical CLV adjustment
+        """
+        # 1. Raw mathematical edge (Kelly numerator)
+        raw_edge = (true_prob.probability * bet_odds) - 1.0
+        
+        # 2. Uncertainty penalty
+        # Higher variance = less confident = require higher edge
+        # PHASE 1 ADJUSTMENT: Reduced from 2.0x to 0.25x for usability while model trains
+        # Will increase back to 1.0x after 60 days of data collection
+        uncertainty_penalty = 0.25 * true_prob.std_error
+        
+        # 3. Market liquidity factor
+        liquidity_factor = self._calculate_liquidity_factor(market_data)
+        
+        # Illiquid markets penalize edge
+        # PHASE 1 ADJUSTMENT: Reduced from 0.02 (2%) to 0.002 (0.2%) for usability
+        # Will increase back to 0.01 (1%) after model matures
+        liquidity_penalty = (1 - liquidity_factor) * 0.002
+        
+        # 4. Bookmaker fill probability
+        # Unreliable bookmakers may not honor large bets
+        # Scales from 0.7 (very unreliable) to 1.0 (pinnacle-level)
+        fill_probability = 0.7 + (bookie_reliability * 0.3)
         # Positive historical CLV = you've been good at finding value
         # Negative = you've been off (alpha decay)
         if historical_clv is not None:
