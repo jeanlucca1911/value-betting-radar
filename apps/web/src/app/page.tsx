@@ -11,6 +11,9 @@ import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import { ArrowRight, TrendingUp, ShieldCheck, Zap, Radar } from 'lucide-react';
 import Link from 'next/link';
+import { EnhancedStatCard } from '@/components/AnimatedStats';
+import { TestimonialsCarousel } from '@/components/TestimonialsCarousel';
+import { ComparisonTable } from '@/components/ComparisonTable';
 
 import { usePortfolioStats } from '@/hooks/usePortfolioStats';
 
@@ -109,42 +112,34 @@ export default function Dashboard() {
         </div>
       </section>
 
-      {/* Stats Overview */}
+      {/* Stats Overview with Premium Components */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-slate-800/50 backdrop-blur p-6 rounded-2xl border border-slate-700/50">
-          <div className="flex items-center gap-4 mb-2">
-            <div className="p-2 bg-emerald-500/10 rounded-lg">
-              <TrendingUp className="h-6 w-6 text-emerald-400" />
-            </div>
-            <h3 className="text-slate-400 font-medium">Total Profit</h3>
-          </div>
-          <p className={'text-3xl font-bold ' + (stats && stats.net_profit >= 0 ? 'text-emerald-400' : 'text-red-400')}>
-            {stats ? ('$' + Math.abs(stats.net_profit).toFixed(2)) : '$0.00'}
-          </p>
-          <p className="text-sm text-slate-500 mt-1">
-            {stats ? ((stats.net_profit >= 0 ? '+$' : '$') + stats.net_profit.toFixed(2) + ' all time') : 'Start betting to see stats'}
-          </p>
-        </div>
-        <div className="bg-slate-800/50 backdrop-blur p-6 rounded-2xl border border-slate-700/50">
-          <div className="flex items-center gap-4 mb-2">
-            <div className="p-2 bg-blue-500/10 rounded-lg">
-              <Zap className="h-6 w-6 text-blue-400" />
-            </div>
-            <h3 className="text-slate-400 font-medium">Active Opportunities</h3>
-          </div>
-          <p className="text-3xl font-bold text-white">{data ? data.length : 0}</p>
-          <p className="text-sm text-slate-500 mt-1">Updated just now</p>
-        </div>
-        <div className="bg-slate-800/50 backdrop-blur p-6 rounded-2xl border border-slate-700/50">
-          <div className="flex items-center gap-4 mb-2">
-            <div className="p-2 bg-purple-500/10 rounded-lg">
-              <Radar className="h-6 w-6 text-purple-400" />
-            </div>
-            <h3 className="text-slate-400 font-medium">Avg. Edge</h3>
-          </div>
-          <p className="text-3xl font-bold text-white">{avgEdge}%</p>
-          <p className="text-sm text-purple-400 mt-1">High value detected</p>
-        </div>
+        <EnhancedStatCard
+          title="Total Profit"
+          value={stats ? Math.abs(stats.net_profit) : 0}
+          valuePrefix="$"
+          change={12}
+          sparklineData={[100, 120, 115, 140, 160, 155, 180]}
+          icon={<TrendingUp className="h-6 w-6" />}
+          iconColor="emerald"
+        />
+        <EnhancedStatCard
+          title="Active Opportunities"
+          value={data ? data.length : 0}
+          change={8}
+          sparklineData={[5, 8, 6, 12, 10, 15, data?.length || 0]}
+          icon={<Zap className="h-6 w-6" />}
+          iconColor="blue"
+        />
+        <EnhancedStatCard
+          title="Average Edge"
+          value={avgEdge}
+          valueSuffix="%"
+          change={5}
+          sparklineData={[3.2, 3.5, 4.1, 3.8, 4.5, 4.2, parseFloat(avgEdge)]}
+          icon={<Radar className="h-6 w-6" />}
+          iconColor="purple"
+        />
       </div>
 
       {/* Live Opportunities Table */}
@@ -181,6 +176,37 @@ export default function Dashboard() {
           <EmptyState sport={sport} />
         )}
       </div>
+
+      {/* Testimonials Section */}
+      <section className="py-16">
+        <TestimonialsCarousel />
+      </section>
+
+      {/* Comparison Table */}
+      <section className="py-16">
+        <ComparisonTable />
+      </section>
+
+      {/* Final CTA */}
+      <motion.section
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        className="text-center py-20 bg-gradient-to-br from-emerald-500/10 to-teal-500/10 rounded-3xl border border-emerald-500/20"
+      >
+        <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+          Ready to Start Winning?
+        </h2>
+        <p className="text-slate-400 text-lg mb-8 max-w-2xl mx-auto">
+          Join thousands of data-driven bettors who've discovered the power of Bayesian probability
+        </p>
+        <Link href="/register">
+          <Button size="lg" variant="premium" className="group text-lg h-14 px-10">
+            Get Started Free
+            <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+          </Button>
+        </Link>
+      </motion.section>
     </div>
   );
 }
