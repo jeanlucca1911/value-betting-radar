@@ -14,6 +14,7 @@ Total cost: ~1,800 credits vs 7,200 for full density
 
 import asyncio
 import sqlite3
+import httpx
 from datetime import datetime, timedelta, timezone
 from typing import List, Dict
 import sys
@@ -22,7 +23,6 @@ from pathlib import Path
 # Add parent directory to path
 sys.path.insert(0, str(Path(__file__).parent))
 
-from services.odds_api import TheOddsApiClient
 from core.config import settings
 
 
@@ -30,7 +30,6 @@ class BulkHistoricalImporter:
     """Import historical odds data in bulk"""
     
     def __init__(self):
-        self.api_client = TheOddsApiClient()
         self.db_path = Path(__file__).parent / "db" / "historical.db"
         
     async def import_historical_data(self, sports: List[str] = None):
@@ -54,30 +53,44 @@ class BulkHistoricalImporter:
         total_matches = 0
         total_credits = 0
         
-        for sport in sports:
-            print(f"\n📊 Importing {sport}...")
-            
-            # Generate sampling schedule
-            snapshots = await self._generate_sampling_schedule(sport)
-            
-            print(f"  Fetching {len(snapshots)} historical snapshots...")
-            
-            for i, snapshot_time in enumerate(snapshots):
-                try:
-                    # Fetch historical odds for this timestamp
-                    response = await self.api_client._make_request(
-                        f"/v4/historical/sports/{sport}/odds",
-                        params={
+        # Create a dedicated HTTP client for all requests
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            for sport in sports:
+                print(f"\n[{sport.upper()}] Importing historical data...")
+                
+                # Generate sampling schedule
+                snapshots = await self._generate_sampling_schedule(sport)
+                
+                print(f"  Fetching {len(snapshots)} historical snapshots...")
+                
+                for i, snapshot_time in enumerate(snapshots):
+                    try:
+                        # Fetch historical odds directly
+                        url = f"https://api.the-odds-api.com/v4/historical/sports/{sport}/odds"
+                        
+                        # Format date with Z suffix (required by API)
+                        date_str = snapshot_time.strftime("%Y-%m-%dT%H:%M:%SZ")
+                        
+                        params = {
+                            "apiKey": settings.THE_ODDS_API_KEY,
                             "regions": "us",
                             "markets": "h2h",
                             "oddsFormat": "decimal",
-                            "date": snapshot_time.isoformat()
+                            "date": date_str
                         }
-                    )
-                    
-                    if response and 'data' in response:
-                        events = response['data']
                         
+                        response = await client.get(url, params=params)
+                        response.raise_for_status()
+                        data = response.json()
+                        
+                        if data and 'data' in data:
+                            events = data['data']
+                        elif isinstance(data, list):
+                            events = data
+                        else:
+                            print(f"    No data returned for {snapshot_time}")
+                            continue
+                            
                         # Store in database
                         stored = await self._store_snapshot(
                             sport=sport,
@@ -92,16 +105,16 @@ class BulkHistoricalImporter:
                         total_credits += 10
                         
                         if (i + 1) % 10 == 0:
-                            print(f"    Progress: {i + 1}/{len(snapshots)} snapshots")
+                            print(f"    Progress: {i + 1}/{len(snapshots)} snapshots, {total_matches} matches so far")
                     
-                    # Rate limiting: 1 request per second
-                    await asyncio.sleep(1)
-                    
-                except Exception as e:
-                    print(f"    Error at {snapshot_time}: {e}")
-                    continue
-            
-            print(f"  ✅ {sport} complete: {total_snapshots} snapshots")
+                        # Rate limiting: 1 request per second
+                        await asyncio.sleep(1)
+                        
+                    except Exception as e:
+                        print(f"    Error at {snapshot_time}: {e}")
+                        continue
+                
+                print(f"  [SUCCESS] {sport} complete: {total_snapshots} snapshots")
         
         print("\n" + "=" * 60)
         print("IMPORT COMPLETE")
@@ -162,17 +175,17 @@ class BulkHistoricalImporter:
         
         for event in events:
             try:
-                match_id = event['id']
+                event_id = event['id']
                 home_team = event['home_team']
                 away_team = event['away_team']
                 commence_time = datetime.fromisoformat(event['commence_time'].replace('Z', '+00:00'))
                 
-                # Insert match if not exists
+                # Insert match if not exists (using 'id' not 'match_id')
                 cursor.execute("""
                     INSERT OR IGNORE INTO matches (
-                        match_id, sport_key, home_team, away_team, commence_time
+                        id, sport_key, home_team, away_team, commence_time
                     ) VALUES (?, ?, ?, ?, ?)
-                """, (match_id, sport, home_team, away_team, commence_time))
+                """, (event_id, sport, home_team, away_team, commence_time))
                 
                 # Insert odds for all bookmakers
                 if 'bookmakers' in event:
@@ -184,16 +197,16 @@ class BulkHistoricalImporter:
                                 for outcome in market['outcomes']:
                                     cursor.execute("""
                                         INSERT INTO odds_snapshots (
-                                            match_id, snapshot_time, bookmaker,
-                                            market, outcome, price
+                                            match_id, bookmaker_key, market_key,
+                                            outcome_name, odds, snapshot_time
                                         ) VALUES (?, ?, ?, ?, ?, ?)
                                     """, (
-                                        match_id,
-                                        snapshot_time,
+                                        event_id,
                                         bookie_name,
                                         'h2h',
                                         outcome['name'],
-                                        outcome['price']
+                                        outcome['price'],
+                                        snapshot_time
                                     ))
                 
                 stored_count += 1
