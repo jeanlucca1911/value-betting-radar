@@ -198,7 +198,7 @@ export default function Dashboard() {
           Ready to Start Winning?
         </h2>
         <p className="text-slate-400 text-lg mb-8 max-w-2xl mx-auto">
-          Join thousands of data-driven bettors who've discovered the power of Bayesian probability
+          Join thousands of data-driven bettors who&apos;ve discovered the power of Bayesian probability
         </p>
         <Link href="/register">
           <Button size="lg" variant="premium" className="group text-lg h-14 px-10">

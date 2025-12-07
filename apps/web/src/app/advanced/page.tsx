@@ -3,7 +3,7 @@
 
 import { useState, useEffect } from 'react';
 import { LeagueSelector } from '@/components/LeagueSelector';
-import { fetcher, API_BASE_URL } from '@/lib/api';
+import { fetcher } from '@/lib/api';
 
 interface PropBet {
     player: string;
