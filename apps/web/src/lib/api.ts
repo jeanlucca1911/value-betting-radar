@@ -3,14 +3,10 @@ export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://value-be
 
 console.log('[API Config] API_BASE_URL:', API_BASE_URL);
 
-export async function fetcher(path: string) {
+export async function fetcher<T>(path: string): Promise<T> {
     const url = `${API_BASE_URL}/${path}`;
-    console.log('[Fetcher] Fetching URL:', url);
 
     const res = await fetch(url);
-
-    console.log('[Fetcher] Response status:', res.status);
-    console.log('[Fetcher] Response headers:', Object.fromEntries(res.headers.entries()));
 
     if (!res.ok) {
         const errorText = await res.text();
@@ -18,13 +14,5 @@ export async function fetcher(path: string) {
         throw new Error(`API Error: ${res.status} - ${errorText}`);
     }
 
-    const data = await res.json();
-    console.log('[Fetcher] Response data:', {
-        isArray: Array.isArray(data),
-        length: Array.isArray(data) ? data.length : 'N/A',
-        firstItem: Array.isArray(data) ? data[0] : data,
-        data: data
-    });
-
-    return data;
+    return res.json();
 }

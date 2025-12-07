@@ -37,10 +37,10 @@ export default function AdvancedMarketsPage() {
             setLoading(true);
             try {
                 if (activeTab === 'props') {
-                    const data = await fetcher<PropBet[]>(`odds/props?sport=${selectedSport}&region=uk`);
+                    const data = await fetcher(`odds/props?sport=${selectedSport}&region=uk`) as PropBet[];
                     setProps(data);
                 } else if (activeTab === 'scores') {
-                    const data = await fetcher<ScoreBet[]>(`odds/scores?sport=${selectedSport}&region=uk`);
+                    const data = await fetcher(`odds/scores?sport=${selectedSport}&region=uk`) as ScoreBet[];
                     setScores(data);
                 }
             } catch (error) {
