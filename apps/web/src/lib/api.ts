@@ -1,11 +1,30 @@
-// Use environment variable in production, fallback to Railway backend
-// Force rebuild: 2024-12-03 13:55
+// Centralized API configuration and fetcher
 export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://value-betting-radar-production.up.railway.app/api/v1';
 
-export async function fetcher<T>(path: string): Promise<T> {
-    const res = await fetch(`${API_BASE_URL}/${path}`);
+console.log('[API Config] API_BASE_URL:', API_BASE_URL);
+
+export async function fetcher(path: string) {
+    const url = `${API_BASE_URL}/${path}`;
+    console.log('[Fetcher] Fetching URL:', url);
+
+    const res = await fetch(url);
+
+    console.log('[Fetcher] Response status:', res.status);
+    console.log('[Fetcher] Response headers:', Object.fromEntries(res.headers.entries()));
+
     if (!res.ok) {
-        throw new Error(`An error occurred while fetching the data: ${res.statusText}`);
+        const errorText = await res.text();
+        console.error('[Fetcher] Error response:', errorText);
+        throw new Error(`API Error: ${res.status} - ${errorText}`);
     }
-    return res.json();
+
+    const data = await res.json();
+    console.log('[Fetcher] Response data:', {
+        isArray: Array.isArray(data),
+        length: Array.isArray(data) ? data.length : 'N/A',
+        firstItem: Array.isArray(data) ? data[0] : data,
+        data: data
+    });
+
+    return data;
 }

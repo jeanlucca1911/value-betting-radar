@@ -18,7 +18,7 @@ import { ComparisonTable } from '@/components/ComparisonTable';
 import { usePortfolioStats } from '@/hooks/usePortfolioStats';
 
 export default function Dashboard() {
-  const [sport, setSport] = useState("soccer_epl");
+  const [sport, setSport] = useState("basketball_nba"); // Changed to NBA for testing
   const { data, error, isLoading } = useLiveOdds(sport, "us"); // Use "us" region by default
   const { stats } = usePortfolioStats();
 
