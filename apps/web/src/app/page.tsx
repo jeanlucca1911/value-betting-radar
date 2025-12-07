@@ -207,6 +207,20 @@ export default function Dashboard() {
           </Button>
         </Link>
       </motion.section>
+    </motion.section>
+
+      {/* DEBUG PANEL - TEMPORARY */ }
+  <div className="fixed bottom-4 right-4 p-4 bg-slate-900 border border-slate-700 rounded-lg shadow-xl z-50 text-xs font-mono text-slate-300 max-w-sm overflow-auto max-h-60 opacity-90">
+    <h4 className="font-bold text-emerald-400 mb-2 border-b border-slate-700 pb-1">🛑 DEBUG PANEL</h4>
+    <div className="space-y-1">
+      <p><span className="text-slate-500">API URL:</span> {API_BASE_URL}</p>
+      <p><span className="text-slate-500">Sport:</span> {sport}</p>
+      <p><span className="text-slate-500">Loading:</span> <span className={isLoading ? "text-yellow-400" : "text-green-400"}>{String(isLoading)}</span></p>
+      <p><span className="text-slate-500">Error:</span> <span className="text-red-400">{error ? JSON.stringify(error) : 'None'}</span></p>
+      <p><span className="text-slate-500">Data Count:</span> {data?.length || 0}</p>
+      <p><span className="text-slate-500">Last Check:</span> {new Date().toLocaleTimeString()}</p>
     </div>
+  </div>
+    </div >
   );
 }
