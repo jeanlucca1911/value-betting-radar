@@ -109,17 +109,15 @@ class AdvancedEdgeCalculator:
         
         # 2. Uncertainty penalty
         # Higher variance = less confident = require higher edge
-        # PHASE 1 ADJUSTMENT: Reduced from 2.0x to 0.25x for usability while model trains
-        # Will increase back to 1.0x after 60 days of data collection
-        uncertainty_penalty = 0.25 * true_prob.std_error
+        # PHASE 2: Standard penalties for robust model (7,000+ matches)
+        uncertainty_penalty = 1.0 * true_prob.std_error
         
         # 3. Market liquidity factor
         liquidity_factor = self._calculate_liquidity_factor(market_data)
         
         # Illiquid markets penalize edge
-        # PHASE 1 ADJUSTMENT: Reduced from 0.02 (2%) to 0.002 (0.2%) for usability
-        # Will increase back to 0.01 (1%) after model matures
-        liquidity_penalty = (1 - liquidity_factor) * 0.002
+        # PHASE 2: Standard 1% penalty for mature model
+        liquidity_penalty = (1 - liquidity_factor) * 0.01
         
         # 4. Bookmaker fill probability
         # Unreliable bookmakers may not honor large bets
